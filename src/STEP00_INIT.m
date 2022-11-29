@@ -3,12 +3,30 @@
 
 function [STEM_data] = STEP00_INIT(STEM_data)
 
+
     %%% STEP00
     STEM_data.error = zeros(1,size(STEM_data.tilt_angles,1));
     
     if STEM_data.use_gpu == 1
          STEM_data.error  = gpuArray(STEM_data.error);
          %STEM_data.tilt_series = gpuArray(STEM_data.tilt_series);
+    end
+
+    % parameter initialize
+    if ~any(ismember(fields(STEM_data),'C3'))
+        STEM_data.C3 = 0;
+    end
+    if ~any(ismember(fields(STEM_data),'C5'))
+        STEM_data.C5 = 0;
+    end    
+    if ~any(ismember(fields(STEM_data),'z_bin'))
+        STEM_data.z_bin = 1;
+    end
+    if mod(STEM_data.z_bin,1) ~= 0
+        error('input error: put a positive integer value into "z_bin".');
+    end
+    if STEM_data.z_bin > size(STEM_data.rec,3)
+        STEM_data.z_bin = size(STEM_data.rec,3);
     end
 
     %%% Generate STEP01 variable
@@ -38,7 +56,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
 
     STEM_data.num_scan_pos = single(size(STEM_data.scan_pos,1));
-    STEM_data.numPlanes = size(STEM_data.rec,3); % z size of pot3D
+    STEM_data.numPlanes = ceil(size(STEM_data.rec,3)/STEM_data.z_bin); % z size of pot3D
     STEM_data.pot_size = [size(STEM_data.rec,1) size(STEM_data.rec,2)]; % potential size (2D)
 
 
@@ -70,8 +88,8 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     STEM_data.qMask = qMask;
     
     % Generate Fresnel freespace propagator & back propagator
-    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize))*q2));
-    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize))*q2));
+    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.z_bin))*q2));
+    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.z_bin))*q2));
     STEM_data.prop2D = single(STEM_data.prop);
     
     if STEM_data.use_gpu == 1
@@ -91,19 +109,13 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     % set up probe scan grid 
     pot_size = STEM_data.pot_size;
     [xx,yy]  = ndgrid([1:pot_size(1)]-round((pot_size(1)+1)/2),...
-        [1:pot_size(2)]-round((pot_size(2)+1)/2));
+                [1:pot_size(2)]-round((pot_size(2)+1)/2));
     
     xx = reshape(xx,[1,prod(pot_size)]);
     yy = reshape(yy,[1,prod(pot_size)]);
     
     % Generate defocus factor + aberration
     STEM_data.probeC1 = -1 * STEM_data.probeDefocus;
-    if ~any(ismember(fields(STEM_data),'C3'))
-        STEM_data.C3 = 0;
-    end
-    if ~any(ismember(fields(STEM_data),'C5'))
-        STEM_data.C5 = 0;
-    end    
     
     chi = (pi*STEM_data.lambda*STEM_data.probeC1)*...
         (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2)...

@@ -9,12 +9,13 @@ function [STEM_data] = STEP02_FORWARD_4D_SSET(STEM_data)
     STEM_data.proj_trans = single(exp(1i*STEM_data.sigma*sum(STEM_data.RVol,3)*STEM_data.potential_pixelsize));
     
     % index
-    x1 = STEM_data.row;
-    y1 = STEM_data.col;
+    %x1 = STEM_data.row;
+    %y1 = STEM_data.col;
+    [x1,y1] = ind2sub([STEM_data.N_scan_x, STEM_data.N_scan_y], STEM_data.k);
     
     % Calculate incident beam wave function
-    wave_f = single(Func_generate_probe_wave_scan(STEM_data.probe_wfn,x1,y1,STEM_data.probe_step_size/STEM_data.potential_pixelsize));
-    %wave_f = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wfn,x1,y1));
+    %wave_f = single(Func_generate_probe_wave_scan(STEM_data.probe_wfn,STEM_data.row,STEM_data.col,STEM_data.probe_step_size/STEM_data.potential_pixelsize));
+    wave_f = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wfn,x1,y1));
     STEM_data.save_wave_f = wave_f;
 
     % Forward propagation

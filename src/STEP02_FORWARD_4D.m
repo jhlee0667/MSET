@@ -6,35 +6,29 @@
 function [STEM_data] = STEP02_FORWARD_4D(STEM_data) 
     
     % make slices of 2D projected potentials
-    %OV=STEM_data.oversampling;
-    %thickness = STEM_data.slice_thickness*OV;
-    %volsize = size(STEM_data.rec,3)*OV;
-    %thickness = STEM_data.slice_thickness;
-    %volsize = size(STEM_data.rec,3);
-
     RotVol = STEM_data.RVol;
-    %potz = double(zeros(size(RotVol,1),size(RotVol,2),ceil(volsize/thickness)));
-
-    %for k=1:ceil(volsize/thickness)
-    %    if k < ceil(volsize/thickness)
-    %        potz(:,:,k)=sum(RotVol(:,:,thickness*(k-1)+1:thickness*k),3);
-    %    else
-    %        potz(:,:,k)=sum(RotVol(:,:,thickness*(k-1)+1:volsize),3);
-    %    end
-    %end
     
     % Calculate transmission function
-    STEM_data.potz = RotVol * STEM_data.potential_pixelsize;
+    %STEM_data.potz = RotVol * STEM_data.potential_pixelsize;
+    for k=1:STEM_data.numPlanes
+       if k < STEM_data.numPlanes
+           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.z_bin*(k-1)+1:STEM_data.z_bin*k),3) .* STEM_data.potential_pixelsize;
+       else
+           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.z_bin*(k-1)+1:size(RotVol,3)),3) .* STEM_data.potential_pixelsize;
+       end
+    end
+    
     STEM_data.trans = single(exp(1i*STEM_data.sigma*STEM_data.potz));
 
 
     % index
-    x1 = STEM_data.row;
-    y1 = STEM_data.col;
-    
+    %x1 = STEM_data.row;
+    %y1 = STEM_data.col;
+    [x1,y1] = ind2sub([STEM_data.N_scan_x, STEM_data.N_scan_y], STEM_data.k);
+
     % Calculate incident beam wave function
     %wave_f = single(Func_generate_probe_wave_scan(STEM_data.probe_wfn,x1,y1,STEM_data.probe_step_size/STEM_data.potential_pixelsize));
-    wave_f = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wfn,x1,y1));
+    wave_f = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wfn,STEM_data.row,STEM_data.col));
 
     
     % Forward propagation
@@ -50,7 +44,8 @@ function [STEM_data] = STEP02_FORWARD_4D(STEM_data)
     STEM_data.full_4D_data{x1,y1} = abs(wave_f).^2;
     
     % load measured 4D data
-    measured_4D_data = STEM_data.measured_4D_data{x1,y1}; 
+    
+    measured_4D_data = STEM_data.measured_4D_data{x1,y1};
     
     % calculate residual vector
     STEM_data.resi_vec = wave_f.*(1-(measured_4D_data).^(0.5)./(STEM_data.full_4D_data{x1,y1}+10^(-30)).^(0.5));
