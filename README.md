@@ -1,4 +1,4 @@
-# Multislice Electron Tomography (MSET) Package
+# MultiSlice Electron Tomography (MSET) Package
 
 This package is implemented for 4D-STEM based electron tomography.
 
