@@ -75,6 +75,7 @@ void upload(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     get_Mxdata(map_input, "scan_ylist", stem_paras->scan_ylist);
     get_Mxdata(map_input, "num_scan_pos", stem_paras->num_scan_pos);
     get_Mxdata(map_input, "step_size", stem_paras->step_size);
+    get_Mxdata(map_input, "slice_binning", stem_paras->slice_binning);
 
     // send CPU data to GPU data
     cudaMemcpy(stem_paras->dev_RVol, stem_paras->RVol, sizeof(float)*dims[0]*dims[1]*dims[2], cudaMemcpyHostToDevice);

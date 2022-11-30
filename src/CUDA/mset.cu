@@ -138,6 +138,14 @@ void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_pot_size, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_sigma, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_i, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
+        
+        // slice_binning
+        for (size_t i = 0; i < dims[0]; ++i){
+            if (i % (size_t) stem_paras->slice_binning[0] != 0){
+                CuPointwiseAdd<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun + i*dims[1]*dims[2], (cufftComplex *) stem_paras->dev_trans_fun + (i / (size_t) stem_paras->slice_binning[0])* (size_t) stem_paras->slice_binning[0] *dims[1]*dims[2], dims[1]*dims[2]);
+            }           
+        }
+
         CuPointwiseExp<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         cudaMemcpy(stem_paras->dev_conj_trans_fun, stem_paras->dev_trans_fun, sizeof(float2)*dims[0]*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
         CuPointwiseConj<<<256, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, dims[0]*dims[1]*dims[2]);
@@ -146,30 +154,30 @@ void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
         
         // FORWARD PROPAGATION calculation
         for (size_t i = 0; i< dims[0]; ++i){
+            if (i % (size_t) stem_paras->slice_binning[0] == 0){
+                // trans_function * wave_2D
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
 
-            // trans_function * wave_2D
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
+                // CUFFT FORWARD
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
+                    return;	
+                }
 
-            // CUFFT FORWARD
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
-                return;	
+                // ifftshift_prop2D * wave_2D
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]); 
+
+                // CUFFT INVERSE
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
+                    return;	
+                }
+                // scaling
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
+                
+                // save the 2D wave funtion into 3D volume
+                cudaMemcpy(stem_paras->dev_save_wave3D + i*dims[1]*dims[2], stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
             }
-
-            // ifftshift_prop2D * wave_2D
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]); 
-
-            // CUFFT INVERSE
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
-                return;	
-            }
-            // scaling
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
-            
-            // save the 2D wave funtion into 3D volume
-            cudaMemcpy(stem_paras->dev_save_wave3D + i*dims[1]*dims[2], stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
-
         }
         // -------------------------------------------------------- 
         
@@ -221,37 +229,43 @@ void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
         
         // BACK PROPAGATION calculation
         for (int i = dims[0]-1; i >= 0; --i){
+            if (i % (size_t) stem_paras->slice_binning[0] == 0){
+                // ifftshift_back_prop2D * wave_2D 
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_back_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
 
-            // ifftshift_back_prop2D * wave_2D 
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_back_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
+                // CUFFT INVERSE
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
+                    return;	
+                }
+                // scaling
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
 
-            // CUFFT INVERSE
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
-                return;	
+                // save 3D grad
+                cudaMemcpy(stem_paras->dev_grad2d, stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
+                cudaMemcpy(stem_paras->dev_tmp, stem_paras->dev_save_wave3D + i*dims[1]*dims[2], sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
+                CuPointwiseConj<<<256, 256>>>((cufftComplex *) stem_paras->dev_tmp, dims[1]*dims[2]);
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_tmp, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2]); 
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2], i);
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_i, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2]);
+                cudaMemcpy(stem_paras->dev_grad_complex + i*dims[1]*dims[2], stem_paras->dev_grad2d, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
+
+                // conjugate_trans_function * wave_2D
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
+
+                // CUFFT FORWARD
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
+                    return;	
+                }
             }
-            // scaling
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
-
-            // save 3D grad
-            cudaMemcpy(stem_paras->dev_grad2d, stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
-            cudaMemcpy(stem_paras->dev_tmp, stem_paras->dev_save_wave3D + i*dims[1]*dims[2], sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
-            CuPointwiseConj<<<256, 256>>>((cufftComplex *) stem_paras->dev_tmp, dims[1]*dims[2]);
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_tmp, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2]); 
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2], i);
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_i, (cufftComplex *) stem_paras->dev_grad2d, dims[1]*dims[2]);
-            cudaMemcpy(stem_paras->dev_grad_complex + i*dims[1]*dims[2], stem_paras->dev_grad2d, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
-
-            // conjugate_trans_function * wave_2D
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
-
-            // CUFFT FORWARD
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
-                return;	
-            }
-
-        } 
+        }
+        // slice_binning 
+        for (size_t i = 0; i < dims[0]; ++i){
+            if (i % (size_t) stem_paras->slice_binning[0] != 0){
+                cudaMemcpy(stem_paras->dev_grad_complex + i*dims[1]*dims[2], stem_paras->dev_grad_complex + (i / (size_t) stem_paras->slice_binning[0])* (size_t) stem_paras->slice_binning[0]*dims[1]*dims[2],  sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
+            }           
+        }
 
 
         // update
@@ -506,6 +520,14 @@ void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_pot_size, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_sigma, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         CuPointwiseMul<<<1024, 256>>>((cufftComplex) complex_i, (cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
+
+        // slice_binning
+        for (size_t i = 0; i < dims[0]; ++i){
+            if (i % (size_t) stem_paras->slice_binning[0] != 0){
+                CuPointwiseAdd<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun + i*dims[1]*dims[2], (cufftComplex *) stem_paras->dev_trans_fun + (i / (size_t) stem_paras->slice_binning[0])* (size_t) stem_paras->slice_binning[0] *dims[1]*dims[2], dims[1]*dims[2]);
+            }           
+        }
+
         CuPointwiseExp<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, dims[0]*dims[1]*dims[2]);
         cudaMemcpy(stem_paras->dev_conj_trans_fun, stem_paras->dev_trans_fun, sizeof(float2)*dims[0]*dims[1]*dims[2], cudaMemcpyDeviceToDevice);
         CuPointwiseConj<<<256, 256>>>((cufftComplex *) stem_paras->dev_conj_trans_fun, dims[0]*dims[1]*dims[2]);
@@ -514,30 +536,30 @@ void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
         
         // FORWARD calculation
         for (size_t i = 0; i< dims[0]; ++i){
+            if (i % (size_t) stem_paras->slice_binning[0] == 0){
+                // trans_function * wave_2D
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
 
-            // trans_function * wave_2D
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_trans_fun, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2], i);
+                // CUFFT FORWARD
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
+                    return;	
+                }
 
-            // CUFFT FORWARD
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_FORWARD) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Forward failed");
-                return;	
+                // ifftshift_prop2D * wave_2D
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]); 
+
+                // CUFFT INVERSE
+                if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
+                    fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
+                    return;	
+                }
+                // scaling
+                CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
+                
+                // save the 2D wave funtion into 3D volume
+                cudaMemcpy(stem_paras->dev_save_wave3D + i*dims[1]*dims[2], stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
             }
-
-            // ifftshift_prop2D * wave_2D
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex *) stem_paras->dev_ifftshift_prop2D, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]); 
-
-            // CUFFT INVERSE
-            if (cufftExecC2C(plan, (cufftComplex *) stem_paras->dev_wave2D, (cufftComplex *) stem_paras->dev_wave2D, CUFFT_INVERSE) != CUFFT_SUCCESS){
-                fprintf(stderr, "CUFFT error: ExecC2C Inverse failed");
-                return;	
-            }
-            // scaling
-            CuPointwiseMul<<<1024, 256>>>((cufftComplex) ifft_scale_factor, (cufftComplex *) stem_paras->dev_wave2D, dims[1]*dims[2]);
-            
-            // save the 2D wave funtion into 3D volume
-            cudaMemcpy(stem_paras->dev_save_wave3D + i*dims[1]*dims[2], stem_paras->dev_wave2D, sizeof(float2)*dims[1]*dims[2], cudaMemcpyDeviceToDevice); 
-
         }
         // -------------------------------------------------------- 
         

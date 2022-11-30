@@ -12,9 +12,9 @@ function [STEM_data] = STEP02_FORWARD_4D(STEM_data)
     %STEM_data.potz = RotVol * STEM_data.potential_pixelsize;
     for k=1:STEM_data.numPlanes
        if k < STEM_data.numPlanes
-           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.z_bin*(k-1)+1:STEM_data.z_bin*k),3) .* STEM_data.potential_pixelsize;
+           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.slice_binning*(k-1)+1:STEM_data.slice_binning*k),3) .* STEM_data.potential_pixelsize;
        else
-           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.z_bin*(k-1)+1:size(RotVol,3)),3) .* STEM_data.potential_pixelsize;
+           STEM_data.potz(:,:,k) = sum(RotVol(:,:,STEM_data.slice_binning*(k-1)+1:size(RotVol,3)),3) .* STEM_data.potential_pixelsize;
        end
     end
     

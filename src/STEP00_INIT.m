@@ -19,14 +19,14 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if ~any(ismember(fields(STEM_data),'C5'))
         STEM_data.C5 = 0;
     end    
-    if ~any(ismember(fields(STEM_data),'z_bin'))
-        STEM_data.z_bin = 1;
+    if ~any(ismember(fields(STEM_data),'slice_binning'))
+        STEM_data.slice_binning = 1;
     end
-    if mod(STEM_data.z_bin,1) ~= 0
-        error('input error: put a positive integer value into "z_bin".');
+    if mod(STEM_data.slice_binning,1) ~= 0
+        error('input error: put a positive integer value into "slice_binning".');
     end
-    if STEM_data.z_bin > size(STEM_data.rec,3)
-        STEM_data.z_bin = size(STEM_data.rec,3);
+    if STEM_data.slice_binning > size(STEM_data.rec,3)
+        STEM_data.slice_binning = size(STEM_data.rec,3);
     end
 
     %%% Generate STEP01 variable
@@ -56,7 +56,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
 
     STEM_data.num_scan_pos = single(size(STEM_data.scan_pos,1));
-    STEM_data.numPlanes = ceil(size(STEM_data.rec,3)/STEM_data.z_bin); % z size of pot3D
+    STEM_data.numPlanes = ceil(size(STEM_data.rec,3)/STEM_data.slice_binning); % z size of pot3D
     STEM_data.pot_size = [size(STEM_data.rec,1) size(STEM_data.rec,2)]; % potential size (2D)
 
 
@@ -88,8 +88,8 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     STEM_data.qMask = qMask;
     
     % Generate Fresnel freespace propagator & back propagator
-    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.z_bin))*q2));
-    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.z_bin))*q2));
+    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*q2));
+    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*q2));
     STEM_data.prop2D = single(STEM_data.prop);
     
     if STEM_data.use_gpu == 1

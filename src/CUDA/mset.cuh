@@ -79,7 +79,8 @@ namespace mset{
         std::vector<float> scan_ylist;
         std::vector<float> num_scan_pos;
         std::vector<float> step_size;
-
+        std::vector<float> slice_binning;
+        
 
         /* Declare variables. (Measured 4D full STEM_data) */
         const mxArray *pMxCell_4DSTEM;
@@ -106,7 +107,8 @@ namespace mset{
 
             std::cout << "number of scan positions:" << num_scan_pos[0] <<std::endl;  
             std::cout << "scan_pos[0]= (" << scan_xlist[0] << ", " << scan_ylist[0] << ")" <<std::endl;  
-            std::cout << "scan_pos[end] = (" << scan_xlist[num_scan_pos[0]-1] << ", " << scan_ylist[num_scan_pos[0]-1] << ")" <<std::endl;  
+            std::cout << "scan_pos[end] = (" << scan_xlist[num_scan_pos[0]-1] << ", " << scan_ylist[num_scan_pos[0]-1] << ")" <<std::endl;
+            std::cout << "slice_binning: " << slice_binning[0] <<std::endl;   
 
         }
 
