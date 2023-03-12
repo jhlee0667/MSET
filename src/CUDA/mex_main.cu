@@ -64,10 +64,7 @@ void upload(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     // get Mxdata (parameters)
     get_Mxdata(map_input, "alpha", stem_paras->alpha); 
     get_Mxdata(map_input, "sigma", stem_paras->sigma);
-    //get_Mxdata(map_input, "inner_angle", stem_paras->inner_angle);
-    //get_Mxdata(map_input, "outer_angle", stem_paras->outer_angle);
     get_Mxdata(map_input, "E0", stem_paras->E0);
-    get_Mxdata(map_input, "probe_step_size", stem_paras->probe_step_size);
     get_Mxdata(map_input, "potential_pixelsize", stem_paras->potential_pixelsize);
     get_Mxdata(map_input, "N_scan_x", stem_paras->N_scan_x);
     get_Mxdata(map_input, "N_scan_y", stem_paras->N_scan_y);
@@ -112,25 +109,17 @@ void run(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[], int opti){
     unsigned long output_dims[3] = {stem_paras->rec_size[2], stem_paras->rec_size[1], stem_paras->rec_size[0]}; 
     unsigned long output_error_dims[1] = {1}; 
     cudaMemcpy(stem_paras->RVol, stem_paras->dev_RVol, sizeof(float)*output_dims[0]*output_dims[1]*output_dims[2], cudaMemcpyDeviceToHost); 
-    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_dims[1]*output_dims[2], cudaMemcpyDeviceToHost); 
+    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_dims[0]*output_dims[1], cudaMemcpyDeviceToHost); 
 
-    if (nlhs == 1) {
-        plhs[0] = mxCreateNumericArray(3, output_dims, mxSINGLE_CLASS,  mxREAL);
-        output = mxGetSingles(plhs[0]);
-
-        for (int i = 0; i < stem_paras->rec_size[0]*stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
-            output[i] = stem_paras->RVol[i];
-        }
+    plhs[0] = mxCreateNumericArray(3, output_dims, mxSINGLE_CLASS,  mxREAL);
+    output = mxGetSingles(plhs[0]);
+    for (int i = 0; i < stem_paras->rec_size[0]*stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
+        output[i] = stem_paras->RVol[i];
     }
-    else if (nlhs == 2){
-        plhs[0] = mxCreateNumericArray(3, output_dims, mxSINGLE_CLASS,  mxREAL);
-        plhs[1] = mxCreateNumericArray(1, output_error_dims, mxSINGLE_CLASS,  mxREAL);
-        output = mxGetSingles(plhs[0]);
-        output_error = mxGetSingles(plhs[1]);
 
-        for (int i = 0; i < stem_paras->rec_size[0]*stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
-            output[i] = stem_paras->RVol[i];
-        }
+    if (nlhs == 2) {
+        plhs[1] = mxCreateNumericArray(1, output_error_dims, mxSINGLE_CLASS,  mxREAL);
+        output_error = mxGetSingles(plhs[1]);
 
         output_error[0] = 0.0f;
         for (int i = 0; i < stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
@@ -155,7 +144,7 @@ void error(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[], int opti)
     float *output_error;
     unsigned long output_dims[3] = {stem_paras->rec_size[2], stem_paras->rec_size[1], stem_paras->rec_size[0]}; 
     unsigned long output_error_dims[1] = {1};
-    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_dims[1]*output_dims[2], cudaMemcpyDeviceToHost); 
+    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_dims[0]*output_dims[1], cudaMemcpyDeviceToHost); 
 
   
     plhs[0] = mxCreateNumericArray(1, output_error_dims, mxSINGLE_CLASS,  mxREAL);

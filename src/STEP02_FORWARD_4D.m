@@ -19,7 +19,7 @@ function [STEM_data] = STEP02_FORWARD_4D(STEM_data)
     end
     
     STEM_data.trans = single(exp(1i*STEM_data.sigma*STEM_data.potz));
-
+    STEM_data.prop = single(STEM_data.prop);
 
     % index
     %x1 = STEM_data.row;
@@ -51,8 +51,14 @@ function [STEM_data] = STEP02_FORWARD_4D(STEM_data)
     STEM_data.resi_vec = wave_f.*(1-(measured_4D_data).^(0.5)./(STEM_data.full_4D_data{x1,y1}+10^(-30)).^(0.5));
     %STEM_data.resi_vec = exp(1i*angle(wave_f)).*(abs(wave_f)-(measured_4D_data).^(0.5));
 
+    % test
+    %STEM_data.resi_vec = wave_f.*(STEM_data.full_4D_data{x1,y1}-measured_4D_data);
+
     % estimate error
     tmp_error = (measured_4D_data.^(0.5)-STEM_data.full_4D_data{x1,y1}.^(0.5)).^2;
+    % test
+    %tmp_error = (STEM_data.full_4D_data{x1,y1}-measured_4D_data).^2;
+
     STEM_data.error(STEM_data.Nth_angle) = STEM_data.error(STEM_data.Nth_angle) + mean(abs(tmp_error(:)))/STEM_data.N_scan_x/STEM_data.N_scan_y;
     %STEM_data.raw_error{x1,y1} = abs(STEM_data.measured_4D_data{x1,y1}.^(0.5)-STEM_data.full_4D_data{x1,y1}.^(0.5));
 

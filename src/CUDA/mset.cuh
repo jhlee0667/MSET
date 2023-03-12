@@ -94,10 +94,7 @@ namespace mset{
         void print(){
             std::cout << "alpha: " << alpha[0] << std::endl;
             std::cout << "sigma: " << sigma[0] << std::endl;
-            //std::cout << "inner_angle: " << inner_angle[0] << std::endl;
-            //std::cout << "outer_angle: " << outer_angle[0] << std::endl;
             std::cout << "E0: " << E0[0] << std::endl;
-            std::cout << "probe_step_size: " << probe_step_size[0] << std::endl;
             std::cout << "potential_pixelsize: " << potential_pixelsize[0] << std::endl;
             std::cout << "rec_size1(z): " << rec_size[0] << "  rec_size2(y): " << rec_size[1] << "  rec_size3(x): " << rec_size[2] <<std::endl;
             std::cout << "step_size: " << step_size[0] <<std::endl;
@@ -105,7 +102,8 @@ namespace mset{
             std::cout << "total num of cells: " << total_num_of_4DCell <<std::endl;
             std::cout << "Dimension of cells: (" << cell_dims[0] << ", " << cell_dims[1] << ")" <<std::endl;  
 
-            std::cout << "number of scan positions:" << num_scan_pos[0] <<std::endl;  
+            std::cout << "number of scan positions: " << num_scan_pos[0] <<std::endl;
+            std::cout << "number of scan (x,y)= (" << N_scan_x[0] << ", " << N_scan_y[0] << ")" <<std::endl;    
             std::cout << "scan_pos[0]= (" << scan_xlist[0] << ", " << scan_ylist[0] << ")" <<std::endl;  
             std::cout << "scan_pos[end] = (" << scan_xlist[num_scan_pos[0]-1] << ", " << scan_ylist[num_scan_pos[0]-1] << ")" <<std::endl;
             std::cout << "slice_binning: " << slice_binning[0] <<std::endl;   

@@ -5,6 +5,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
 
     %%% STEP00
+    STEM_data.rec = single(STEM_data.rec);
     STEM_data.error = zeros(1,size(STEM_data.tilt_angles,1));
     
     if STEM_data.use_gpu == 1
@@ -12,7 +13,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
          %STEM_data.tilt_series = gpuArray(STEM_data.tilt_series);
     end
 
-    % parameter initialize
+    %%% parameter initialize
     if ~any(ismember(fields(STEM_data),'C3'))
         STEM_data.C3 = 0;
     end
@@ -28,6 +29,17 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if STEM_data.slice_binning > size(STEM_data.rec,3)
         STEM_data.slice_binning = size(STEM_data.rec,3);
     end
+    %%% regularization
+    % positivity
+    if ~any(ismember(fields(STEM_data),'use_positivity'))
+        STEM_data.use_positivity = 1;
+    end
+    % TV regularization
+    if ~any(ismember(fields(STEM_data),'use_TV'))
+        STEM_data.use_TV = 0;
+    end
+
+
 
     %%% Generate STEP01 variable
     % Calculate scan positions
@@ -125,11 +137,31 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2).^4;
     
     % Generate probe wave function
-    probe_wf = sum(exp(-1i*chi ...
-                    -2i*pi ...
-                   *(STEM_data.qxa(STEM_data.beamsIndex).*xx*STEM_data.potential_pixelsize ...
-                   + STEM_data.qya(STEM_data.beamsIndex).*yy*STEM_data.potential_pixelsize))...
-                   ,1);
+    Memory_saving_N = 20;
+    Nstep = ceil(STEM_data.numberBeams/Memory_saving_N); 
+    probe_wf =zeros(size(xx));
+    for i = 1:Memory_saving_N
+        if i<=Memory_saving_N-1
+            probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:Nstep*i) ...
+                            -2i*pi ...
+                           *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*xx*STEM_data.potential_pixelsize ...
+                           + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*yy*STEM_data.potential_pixelsize))...
+                           ,1);
+        else
+            probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:end) ...
+                            -2i*pi ...
+                           *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*xx*STEM_data.potential_pixelsize ...
+                           + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*yy*STEM_data.potential_pixelsize))...
+                           ,1);
+        end
+
+    end
+
+    %probe_wf = sum(exp(-1i*chi ...
+    %                -2i*pi ...
+    %               *(STEM_data.qxa(STEM_data.beamsIndex).*xx*STEM_data.potential_pixelsize ...
+    %               + STEM_data.qya(STEM_data.beamsIndex).*yy*STEM_data.potential_pixelsize))...
+    %               ,1);
 
     probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);          
     

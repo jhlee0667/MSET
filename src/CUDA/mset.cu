@@ -196,7 +196,7 @@ void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
         
 
         // get measured 4D STEM data
-        stem_paras->pMxCell_4DSTEM_element = mxGetCell(stem_paras->pMxCell_4DSTEM, scan_p);//(scan_y-1)*scan_size[1]+(scan_x-1));
+        stem_paras->pMxCell_4DSTEM_element = mxGetCell(stem_paras->pMxCell_4DSTEM, scan_p);
         stem_paras->tmp_4Dcell_array = mxGetSingles(stem_paras->pMxCell_4DSTEM_element);
 
         
@@ -578,7 +578,7 @@ void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
         
 
         // get measured 4D STEM data
-        stem_paras->pMxCell_4DSTEM_element = mxGetCell(stem_paras->pMxCell_4DSTEM, scan_p);//(scan_y-1)*scan_size[1]+(scan_x-1));
+        stem_paras->pMxCell_4DSTEM_element = mxGetCell(stem_paras->pMxCell_4DSTEM, scan_p);
         stem_paras->tmp_4Dcell_array = mxGetSingles(stem_paras->pMxCell_4DSTEM_element);
 
         
@@ -595,15 +595,9 @@ void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
         CuPointwiseSub<<<1024, 256>>>((float *) stem_paras->dev_fourier_inten, (float *) stem_paras->dev_tmp_error_array, dims[1]*dims[2]); 
         CuPointwiseAbsSquare<<<1024, 256>>>((float *) stem_paras->dev_tmp_error_array, dims[1]*dims[2]);
         CuPointwiseAdd<<<1024, 256>>>((float *) stem_paras->dev_tmp_error_array, (float *) stem_paras->dev_error_array, dims[1]*dims[2]);
-
-        // divide estimated Fourier intensity by measured Fourier intensity (result: second argument)
-        CuPointwiseDiv<<<1024, 256>>>((float *) stem_paras->dev_tmp_ifftshift_4Dcell_array, (float *) stem_paras->dev_fourier_inten, dims[1]*dims[2]); 
-        
         // --------------------------------------------------------  
 
     }
-    
-
 }
 
 
