@@ -88,7 +88,8 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 [STEM_data] = STEP01_ROTATION(STEM_data);
                 
                 STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
-                %STEM_data.measured_4D_data = cellfun(@single,tmp_STEM_data.full_4D_data,'un',0);
+                STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
+
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);
                 STEM_data.N_scan_y = size(STEM_data.measured_4D_data,2);
                 STEM_data.scan_xlist = squeeze(STEM_data.scan_pos(:,1,j));
@@ -158,9 +159,11 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 [STEM_data] = STEP01_ROTATION(STEM_data);
         
                 STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
+                STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
+
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);
                 STEM_data.N_scan_y = size(STEM_data.measured_4D_data,2);
-                %STEM_data.measured_4D_data = cellfun(@single,tmp_STEM_data.full_4D_data,'un',0);
+
                 STEM_data.scan_xlist = squeeze(STEM_data.scan_pos(:,1,j));
                 STEM_data.scan_ylist = squeeze(STEM_data.scan_pos(:,2,j));
     
