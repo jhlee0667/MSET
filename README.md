@@ -9,10 +9,6 @@ Please check the GPU memory and computation time if you want to increase volume 
 
 ### Requirements
 - matlab (>= 2018a)
-- CUDA
-
-### Reconmended environment
-- Linux
 - CUDA (11.4 was tested)
 
 ### How to start
