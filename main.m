@@ -8,7 +8,7 @@
 clear all
 clc
 
-%%
+%% input parameters
 %%% input data %%%
 STEM_data.input_filepath = './examples/CuAu_24size_dataset'; % 4D-STEM input data folder path
 STEM_data.input_filename = 'CuAu_s24_p72_Np_8_4DSTEM_data'; % 4D-STEM input data file name
