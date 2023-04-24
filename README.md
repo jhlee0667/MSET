@@ -5,7 +5,7 @@ This package is implemented for 4D-STEM based electron tomography.
 For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, *Phyiscal Review Applied* (accepted), arXiv:2210.12636.
 
 This reconstruction require much computaional resource.
-Please check the GPU memory and computation time if you want to increase volume size, 
+Please check the GPU memory and computation time if you want to increase volume size.
 
 ### Requirements
 - matlab (>= 2018a)
