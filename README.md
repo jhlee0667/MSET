@@ -2,8 +2,21 @@
 
 This package is implemented for 4D-STEM based electron tomography.
 
-For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using 4D-STEM, arXiv:2210.12636.
+For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, *Phyiscal Review Applied* (accepted), arXiv:2210.12636.
+
+This reconstruction require much computaional resource.
+Please check the GPU memory and computation time if you want to increase volume size, 
 
 ### Requirements
 - matlab (>= 2018a)
 - CUDA
+
+### Reconmended environment
+- Linux
+- CUDA (11.4 was tested)
+
+### How to start
+run ./main.m
+
+### compile for CUDA version
+run ./src/CUDA/compile.m in matlab environment
