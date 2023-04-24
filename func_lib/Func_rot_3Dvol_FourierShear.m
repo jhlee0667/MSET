@@ -11,8 +11,8 @@ function RotVol = Func_rot_3Dvol_FourierShear(Vol, vec1, vec2, vec3 ,phi, theta,
       
     R =(R1*R2*R3)';
 
-    if abs(theta) > 1
-        RotVol = My_rotate_3Dvol_ROTmat_FourierShear_ver4(Vol,R,11);
+    if abs(theta) > 0.5 || abs(phi) > 0.5 || abs(psi) > 0.5
+        RotVol = Func_rotate_3Dvol_ROTmat_FourierShear(Vol,R,11);
     else
         RotVol = Vol;
     end

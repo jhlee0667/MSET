@@ -4,7 +4,7 @@
 function [STEM_data] = STEP00_INIT(STEM_data)
 
 
-    %%% STEP00
+    %%% parameter initialize
     STEM_data.rec = single(STEM_data.rec);
     STEM_data.error = zeros(1,size(STEM_data.tilt_angles,1));
     
@@ -13,13 +13,54 @@ function [STEM_data] = STEP00_INIT(STEM_data)
          %STEM_data.tilt_series = gpuArray(STEM_data.tilt_series);
     end
 
-    %%% parameter initialize
+    % check: folder location
+    if ~isfolder(STEM_data.output_filepath)
+        mkdir(STEM_data.output_filepath);
+        fprintf('mkdir: %s \n',STEM_data.output_filepath);
+    end
+
+    % check: method
+    if ~any(ismember(fields(STEM_data),'method'))
+        STEM_data.method = 0;
+    end
+    if ~any(ismember(fields(STEM_data),'use_gpu'))
+        STEM_data.use_gpu = 0;
+    end
+
+    % check: metadata
+    if ~any(ismember(fields(STEM_data),'potential_pixelsize'))
+        error('input error: put potential_pixelsize value into "potential_pixelsize".');
+    end
+    if ~any(ismember(fields(STEM_data),'N_iter'))
+        error('input error: put number of iterations value into "N_iter".');
+    end
+
+    % check: rotation angle direction
+    if ~any(ismember(fields(STEM_data),'vec1'))
+        STEM_data.vec1 = [0 0 1];
+    end
+    if ~any(ismember(fields(STEM_data),'vec2'))
+        STEM_data.vec2 = [0 1 0];
+    end    
+    if ~any(ismember(fields(STEM_data),'vec3'))
+        STEM_data.vec3 = [1 0 0];
+    end
+
+    % check: probe wavefunction parameter
+    if ~any(ismember(fields(STEM_data),'alpha'))
+        error('input error: put forming aperture value into "alpha".');
+    end
+    if ~any(ismember(fields(STEM_data),'probeDefocus'))
+        error('input error: put probeDefocus value into "probeDefocus".');
+    end
     if ~any(ismember(fields(STEM_data),'C3'))
         STEM_data.C3 = 0;
     end
     if ~any(ismember(fields(STEM_data),'C5'))
         STEM_data.C5 = 0;
     end    
+
+    % check: slice binning parameter
     if ~any(ismember(fields(STEM_data),'slice_binning'))
         STEM_data.slice_binning = 1;
     end
@@ -29,14 +70,31 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if STEM_data.slice_binning > size(STEM_data.rec,3)
         STEM_data.slice_binning = size(STEM_data.rec,3);
     end
-    %%% regularization
-    % positivity
+
+    % check: step size parameter
+    if ~any(ismember(fields(STEM_data),'step_size'))
+        error('input error: put step size into "step_size".');
+    else
+        if length(STEM_data.step_size) == 1
+            STEM_data.step_size = [STEM_data.step_size, 0, 0];
+        elseif size(STEM_data.step_size,2) == 3
+        else
+            error('input error: put properly format (1x3) of step size into "step_size".');
+        end
+    end
+
+    % check: regularization parameter
+    if ~any(ismember(fields(STEM_data),'bls_parameter'))
+        STEM_data.bls_parameter = 0.1;
+    end
     if ~any(ismember(fields(STEM_data),'use_positivity'))
         STEM_data.use_positivity = 1;
     end
-    % TV regularization
     if ~any(ismember(fields(STEM_data),'use_TV'))
         STEM_data.use_TV = 0;
+    end
+    if ~any(ismember(fields(STEM_data),'TV_lambda'))
+        STEM_data.TV_lambda = 0.005;
     end
 
 
@@ -187,13 +245,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
                 end
         
             end
-    
-            %probe_wf = sum(exp(-1i*chi ...
-            %                -2i*pi ...
-            %               *(STEM_data.qxa(STEM_data.beamsIndex).*xx*STEM_data.potential_pixelsize ...
-            %               + STEM_data.qya(STEM_data.beamsIndex).*yy*STEM_data.potential_pixelsize))...
-            %               ,1);
-        
+
             probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);          
             
             fft_probe_wf = fft2(probe_wf);
