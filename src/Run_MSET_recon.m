@@ -48,6 +48,13 @@
 % mat_save.rec: reconstruction file for each iteration 
 % mat_save.error: mean error list for each iteration 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%     data form     %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 4D-STEM data: (Rx, Ry, Qx, Qy) each cell (Rx, Ry) has 2D array (Qx, Qy) 
+% probe scan position: (Rx, Ry)
+% 3D object reconstruction: (Qx, Qy, Qx)
 
 
 function [STEM_data] = Run_MSET_recon(STEM_data)
@@ -259,10 +266,4 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
         mat_save.total_mean_error(:,N_iter-40:N_iter)=[];
     end
 
-
 end
-
-
-
-
-

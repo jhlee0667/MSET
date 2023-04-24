@@ -43,4 +43,4 @@ STEM_data.TV_lambda = 0.005; % TV lambda parameter
 
 
 %% Run
-[STEM_data] = Run_MSET_recon(STEM_data);
+[STEM_data] = Q(STEM_data);
