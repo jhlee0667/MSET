@@ -9,14 +9,16 @@ Please check the GPU memory and computation time if you want to increase volume 
 
 ### Requirements
 - matlab (>= 2018a)
-- CUDA
-
-### Reconmended environment
-- Linux
 - CUDA (11.4 was tested)
 
 ### How to start
 run ./main.m
 
-### compile for CUDA version
+### Compile for CUDA version MSET
 run ./src/CUDA/compile.m in matlab environment
+
+
+# further developing..
+- probe optimization
+- scan position optimization
+not fully implemented. (only MSET cpu version is open.)
