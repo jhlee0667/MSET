@@ -2,9 +2,9 @@
 
 This package is implemented for 4D-STEM based electron tomography.
 
-For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, *Phyiscal Review Applied* (accepted), arXiv:2210.12636.
+For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, *Physical Review Applied* (accepted), arXiv:2210.12636.
 
-This reconstruction require much computaional resource.
+This reconstruction method requires much computaional resources.
 Please check the GPU memory and computation time if you want to increase volume size.
 
 ### Requirements
@@ -12,13 +12,13 @@ Please check the GPU memory and computation time if you want to increase volume 
 - CUDA (11.4 was tested)
 
 ### How to start
-run ./main.m
+Run ./main.m
 
 ### Compile for CUDA version MSET
-run ./src/CUDA/compile.m in matlab environment
+Run ./src/CUDA/compile.m in matlab environment.
 
 
 # further developing..
-- probe optimization
-- scan position optimization
-not fully implemented. (only MSET cpu version is open.)
+- a probe optimization
+- a scan position optimization
+not fully implemented yey. (only MSET cpu version is available.)
