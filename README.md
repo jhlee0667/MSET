@@ -22,4 +22,4 @@ Run ./src/CUDA/compile.m in matlab environment.
 - probe optimization
 - probe scan position optimization
 
-not fully implemented yet. (only MSET cpu version is available.)
+not fully implemented yet. (only cpu version MSET is available.)
