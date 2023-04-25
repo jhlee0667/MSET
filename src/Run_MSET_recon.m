@@ -211,7 +211,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
             if old_mean_error > mean(STEM_data.error)
                 break;
             else
-                fprintf('--//bls: mean error: %.11f, step_size: %d -> %d \n', mean(STEM_data.error), STEM_data.step_size, STEM_data.step_size*STEM_data.bls_parameter);
+                fprintf('--//bls: mean error: %.11f, object step_size: %d -> %d \n', mean(STEM_data.error), STEM_data.step_size(1), STEM_data.step_size(1)*STEM_data.bls_parameter);
                 STEM_data.rec = old_rec;
                 STEM_data.probe_wfn = old_probe;
                 STEM_data.scan_pos = old_scan_pos;
@@ -227,7 +227,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
         end
         
         if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * step_size(1)
-            fprintf('break: step_size: %d \n', STEM_data.step_size);
+            fprintf('break: step_size: [%d, %d, %d] \n', STEM_data.step_size(1),STEM_data.step_size(2),STEM_data.step_size(3));
             break;
         end
         toc
