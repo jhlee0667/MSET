@@ -260,10 +260,10 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     tEnd = toc(tStart)
     
     mat_save.STEM_data = STEM_data;
-    if breakflag == 1 && N_iter > 50
-        mat_save.rec_save(:,:,:,N_iter-40:N_iter)=[];
-        mat_save.mean_error(:,N_iter-40:N_iter)=[];
-        mat_save.total_mean_error(:,N_iter-40:N_iter)=[];
+    if breakflag == 1 && STEM_data.N_iter > 50
+        mat_save.rec_save(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
+        mat_save.mean_error(:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
+        mat_save.total_mean_error(:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
     end
 
 end
