@@ -253,7 +253,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
             mat_save.rec_save(:,:,:,i) = gather(STEM_data.rec);
         end
         mat_save.mean_error(1, i) = mean_error;
-        
+        STEM_data.errorlist(1, i) = mean_error;
         old_mean_error = mean_error;
     end
     tEnd = toc(tStart)
