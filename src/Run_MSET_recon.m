@@ -3,9 +3,9 @@
 % Y.Yang, Multi-Dimensional Atomic Imaging Lab
 % Multislice electron tomography
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% input parameters %%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% input parameters  %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% input data %%%
 % STEM_data.input_filepath: 4D-STEM input data folder path
@@ -38,7 +38,6 @@
 % STEM_data.use_positivity: positivity on(1)/off(0)
 % STEM_data.use_TV: TV regularization on(1)/off(0)
 % STEM_data.TV_lambda: TV lambda parameter
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% output parameters %%%%%%%%
