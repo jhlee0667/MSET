@@ -15,7 +15,7 @@ Please check the GPU memory and computation time if you want to increase volume 
 Run ./main.m
 
 ### Compile for CUDA version MSET
-Run ./src/CUDA/compile.m in matlab environment.
+Run ./src/CUDA/compile.m in MATLAB environment.
 
 
 #### further developing..
