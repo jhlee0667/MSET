@@ -12,7 +12,7 @@ Please check the GPU memory and computation time if you want to increase volume 
 - CUDA (11.4 was tested)
 
 ### How to start
-Run ./main.m
+Run ./main.m in MATLAB environment.
 
 ### Compile for CUDA version MSET
 Run ./src/CUDA/compile.m in MATLAB environment.
