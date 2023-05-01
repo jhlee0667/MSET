@@ -131,15 +131,18 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 elseif STEM_data.use_gpu==2
         
                     % STEP02-04
-                    mset_cuda_kernel_t1('upload', STEM_data, STEM_data.measured_4D_data);
+                    mset_cuda_kernel('upload', STEM_data, STEM_data.measured_4D_data);
     
                     if STEM_data.method == 1
-                        [tmp_RVol, ~] = mset_cuda_kernel('run_sset',STEM_data, STEM_data.measured_4D_data);               
+                        [tmp_RVol, tmp_probe, tmp_scan_xlist, tmp_scan_ylist] = mset_cuda_kernel('run_sset',STEM_data, STEM_data.measured_4D_data);               
                     else
-                        [tmp_RVol, ~] = mset_cuda_kernel('run_mset',STEM_data, STEM_data.measured_4D_data);            
+                        [tmp_RVol, tmp_probe, tmp_scan_xlist, tmp_scan_ylist] = mset_cuda_kernel('run_mset',STEM_data, STEM_data.measured_4D_data);            
                     end
                     
                     STEM_data.RVol = tmp_RVol;
+                    STEM_data.probe_wfn(:,:,STEM_data.Nth_angle) = tmp_probe;
+                    STEM_data.scan_pos(:,1,j) = tmp_scan_xlist;
+                    STEM_data.scan_pos(:,2,j) = tmp_scan_ylist;
                     clear mset_cuda_kernel
     
                 end
@@ -172,7 +175,8 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
 
                 STEM_data.scan_xlist = squeeze(STEM_data.scan_pos(:,1,j));
                 STEM_data.scan_ylist = squeeze(STEM_data.scan_pos(:,2,j));
-    
+                STEM_data.init_wave2D = single(STEM_data.probe_wfn(:,:,j));
+
                 if STEM_data.use_gpu == 0 || STEM_data.use_gpu == 1
                     for k = 1:size(STEM_data.scan_pos,1)
                         
@@ -192,7 +196,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 elseif STEM_data.use_gpu == 2
         
                     % STEP02-04
-                    mset_cuda_kernel_t1('upload',STEM_data, STEM_data.measured_4D_data);
+                    mset_cuda_kernel('upload',STEM_data, STEM_data.measured_4D_data);
     
                     if STEM_data.method == 1
                         [tmp_error] = mset_cuda_kernel('error_sset',STEM_data, STEM_data.measured_4D_data);
@@ -215,7 +219,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.probe_wfn = old_probe;
                 STEM_data.scan_pos = old_scan_pos;
     
-                STEM_data.step_size = STEM_data.bls_parameter * STEM_data.step_size;
+                STEM_data.step_size = STEM_data.bls_parameter .* STEM_data.step_size;
             end
             
             if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * step_size(1)

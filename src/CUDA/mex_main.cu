@@ -105,21 +105,43 @@ void run(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[], int opti){
 
 
     /* extract reconstructed 3D volume */
-    float *output, *output_error;
-    unsigned long output_dims[3] = {stem_paras->rec_size[2], stem_paras->rec_size[1], stem_paras->rec_size[0]}; 
+    float *output_rec, *output_scan_xlist, *output_scan_ylist, *output_error;
+    mxComplexSingle *output_probe;
+    unsigned long output_rec_dims[3] = {stem_paras->rec_size[2], stem_paras->rec_size[1], stem_paras->rec_size[0]}; 
+    unsigned long output_probe_dims[2] = {stem_paras->rec_size[2], stem_paras->rec_size[1]};
+    unsigned long output_scanpos_dims[1] = {(unsigned long) stem_paras->num_scan_pos[0]}; 
     unsigned long output_error_dims[1] = {1}; 
-    cudaMemcpy(stem_paras->RVol, stem_paras->dev_RVol, sizeof(float)*output_dims[0]*output_dims[1]*output_dims[2], cudaMemcpyDeviceToHost); 
-    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_dims[0]*output_dims[1], cudaMemcpyDeviceToHost); 
-
-    plhs[0] = mxCreateNumericArray(3, output_dims, mxSINGLE_CLASS,  mxREAL);
-    output = mxGetSingles(plhs[0]);
+    cudaMemcpy(stem_paras->RVol, stem_paras->dev_RVol, sizeof(float)*output_rec_dims[0]*output_rec_dims[1]*output_rec_dims[2], cudaMemcpyDeviceToHost); 
+    cudaMemcpy(stem_paras->init_wave2D, stem_paras->dev_init_wave2D, sizeof(float2)*output_probe_dims[0]*output_probe_dims[1], cudaMemcpyDeviceToHost); 
+    cudaMemcpy(stem_paras->error_array, stem_paras->dev_error_array, sizeof(float)*output_rec_dims[0]*output_rec_dims[1], cudaMemcpyDeviceToHost); 
+    
+    // object output
+    plhs[0] = mxCreateNumericArray(3, output_rec_dims, mxSINGLE_CLASS, mxREAL);
+    output_rec = mxGetSingles(plhs[0]);
     for (int i = 0; i < stem_paras->rec_size[0]*stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
-        output[i] = stem_paras->RVol[i];
+        output_rec[i] = stem_paras->RVol[i];
+    }
+    // probe wave output
+    plhs[1] = mxCreateNumericArray(2, output_probe_dims, mxSINGLE_CLASS, mxCOMPLEX);
+    output_probe = mxGetComplexSingles(plhs[1]);
+    for (int i = 0; i < stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 
+        output_probe[i].real = stem_paras->init_wave2D[i].x;
+        output_probe[i].imag = stem_paras->init_wave2D[i].y;
+    }
+    // scan position output
+    plhs[2] = mxCreateNumericArray(1, output_scanpos_dims, mxSINGLE_CLASS, mxREAL);
+    plhs[3] = mxCreateNumericArray(1, output_scanpos_dims, mxSINGLE_CLASS, mxREAL); 
+    output_scan_xlist = mxGetSingles(plhs[2]);
+    output_scan_ylist = mxGetSingles(plhs[3]);
+    for (int i = 0; i < stem_paras->num_scan_pos[0]; ++i){ 
+        output_scan_xlist[i] = stem_paras->scan_xlist[i];
+        output_scan_ylist[i] = stem_paras->scan_ylist[i];
     }
 
-    if (nlhs == 2) {
-        plhs[1] = mxCreateNumericArray(1, output_error_dims, mxSINGLE_CLASS,  mxREAL);
-        output_error = mxGetSingles(plhs[1]);
+    // error output
+    if (nlhs == 5) {
+        plhs[4] = mxCreateNumericArray(1, output_error_dims, mxSINGLE_CLASS, mxREAL);
+        output_error = mxGetSingles(plhs[4]);
 
         output_error[0] = 0.0f;
         for (int i = 0; i < stem_paras->rec_size[1]*stem_paras->rec_size[2]; ++i){ 

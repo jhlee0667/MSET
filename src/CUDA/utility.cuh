@@ -90,6 +90,11 @@ void circular_shift2D(double *f1, double *f2, int dims1, int dims2, int N1_shift
 __global__ void fourier_shift_factor_dev(cufftComplex *f, int dims1, int dims2, float N1_shift, float N2_shift);
 __global__ void fourier_shift_factor_dev(cufftDoubleComplex *f, int dims1, int dims2, float N1_shift, float N2_shift);
 
+__global__ void gradient_2D_dev(cufftComplex *f1, cufftComplex *f2, int dims1, int dims2, int option);
+__global__ void gradient_2D_dev(cufftDoubleComplex *f1, cufftDoubleComplex *f2, int dims1, int dims2, int option);
+
+float Cusum_real(cufftComplex *f, size_t size);
+
 void print_array_dev(float *a, size_t dims1, size_t dims2);
 void print_array_dev(cufftComplex *a, size_t dims1, size_t dims2);
 void print_array_dev(double *a, size_t dims1, size_t dims2);

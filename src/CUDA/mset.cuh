@@ -42,6 +42,7 @@ namespace mset{
         float2* dev_ifftshift_prop2D;
         float2* dev_ifftshift_back_prop2D;
         float2* dev_init_wave2D;
+        float2* dev_tmp_init_wave2D;
         float2* dev_fsfactor;
         float2* dev_shift_fsfactor;
         float2* dev_wave2D;
@@ -50,6 +51,7 @@ namespace mset{
         float* dev_grad;
         float2* dev_grad2d;
         float2* dev_tmp;
+        float* dev_tmp_1D;
         
         float* dev_error_array;
         float* dev_tmp_error_array;
@@ -97,7 +99,7 @@ namespace mset{
             std::cout << "E0: " << E0[0] << std::endl;
             std::cout << "potential_pixelsize: " << potential_pixelsize[0] << std::endl;
             std::cout << "rec_size1(z): " << rec_size[0] << "  rec_size2(y): " << rec_size[1] << "  rec_size3(x): " << rec_size[2] <<std::endl;
-            std::cout << "step_size: " << step_size[0] <<std::endl;
+            std::cout << "object step_size: " << step_size[0] << ", probe step_size: " << step_size[1] << ", scan pos step_size: " << step_size[2] <<std::endl;
             
             std::cout << "total num of cells: " << total_num_of_4DCell <<std::endl;
             std::cout << "Dimension of cells: (" << cell_dims[0] << ", " << cell_dims[1] << ")" <<std::endl;  

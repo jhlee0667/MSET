@@ -825,6 +825,122 @@ __global__ void fourier_shift_factor_dev(cufftDoubleComplex *f, int dims1, int d
 
 }
 
+// gradient 2D array -> 2D array
+__global__ void gradient_2D_dev(cufftComplex *f1, cufftComplex *f2, int dims1, int dims2, int option)
+{
+    const int numThreads = blockDim.x * gridDim.x;
+    const int threadID = blockIdx.x * blockDim.x + threadIdx.x;
+    int n1, n2; 
+
+    if (option == 1){
+        for (int i = threadID; i < dims1*dims2; i += numThreads)
+        {
+            n1 = i/dims2;
+            n2 = i%dims2;
+            if (n1 == 0){
+                f2[i].x = f1[i+dims2].x - f1[i].x;
+                f2[i].y = f1[i+dims2].y - f1[i].y;
+            }            
+            else if (n1 == dims1-1){
+                f2[i].x = f1[i].x - f1[i-dims2].x;
+                f2[i].y = f1[i].y - f1[i-dims2].y;
+            }
+            else{
+                f2[i].x = (f1[i+dims2].x - f1[i-dims2].x)/2.0f;
+                f2[i].y = (f1[i+dims2].y - f1[i-dims2].y)/2.0f;
+            }
+        }    
+
+    }
+    else if(option == 2){
+        for (int i = threadID; i < dims1*dims2; i += numThreads)
+        {
+            n1 = i/dims2;
+            n2 = i%dims2;
+            if (n2 == 0){
+                f2[i].x = f1[i+1].x - f1[i].x;
+                f2[i].y = f1[i+1].y - f1[i].y;
+            }            
+            else if (n2 == dims2-1){
+                f2[i].x = f1[i].x - f1[i-1].x;
+                f2[i].y = f1[i].y - f1[i-1].y;
+            }
+            else{
+                f2[i].x = (f1[i+1].x - f1[i-1].x)/2.0f;
+                f2[i].y = (f1[i+1].y - f1[i-1].y)/2.0f;
+            }
+        }
+    }     
+    return;
+
+}
+
+__global__ void gradient_2D_dev(cufftDoubleComplex *f1, cufftDoubleComplex *f2, int dims1, int dims2, int option)
+{
+    const int numThreads = blockDim.x * gridDim.x;
+    const int threadID = blockIdx.x * blockDim.x + threadIdx.x;
+    int n1, n2; 
+
+    if (option == 1){
+        for (int i = threadID; i < dims1*dims2; i += numThreads)
+        {
+            n1 = i/dims2;
+            n2 = i%dims2;
+            if (n1 == 0){
+                f2[i].x = f1[i+dims2].x - f1[i].x;
+                f2[i].y = f1[i+dims2].y - f1[i].y;
+            }            
+            else if (n1 == dims1-1){
+                f2[i].x = f1[i].x - f1[i-dims2].x;
+                f2[i].y = f1[i].y - f1[i-dims2].y;
+            }
+            else{
+                f2[i].x = (f1[i+dims2].x - f1[i-dims2].x)/2.0;
+                f2[i].y = (f1[i+dims2].y - f1[i-dims2].y)/2.0;
+            }
+        }    
+
+    }
+    else if(option == 2){
+        for (int i = threadID; i < dims1*dims2; i += numThreads)
+        {
+            n1 = i/dims2;
+            n2 = i%dims2;
+            if (n2 == 0){
+                f2[i].x = f1[i+1].x - f1[i].x;
+                f2[i].y = f1[i+1].y - f1[i].y;
+            }            
+            else if (n2 == dims2-1){
+                f2[i].x = f1[i].x - f1[i-1].x;
+                f2[i].y = f1[i].y - f1[i-1].y;
+            }
+            else{
+                f2[i].x = (f1[i+1].x - f1[i-1].x)/2.0;
+                f2[i].y = (f1[i+1].y - f1[i-1].y)/2.0;
+            }
+        }
+    }     
+    return;
+
+}
+
+
+float Cusum_real(cufftComplex *f, size_t size)
+{
+    float output = 0.0f;
+    float2 *tmp_result1;
+    tmp_result1 = new float2[size]; 
+
+    cudaMemcpy(tmp_result1, f, sizeof(float2)*size, cudaMemcpyDeviceToHost);
+    for(size_t i=0; i<size; i++){
+        output += tmp_result1[i].x; 
+    }
+    //std::cout << output << std::endl;
+
+    delete [] tmp_result1; 
+    return output;
+}
+
 
 // print array for debugging
 
