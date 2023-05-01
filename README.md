@@ -18,7 +18,7 @@ Run ./main.m in MATLAB environment.
 Run ./src/CUDA/compile.m in MATLAB environment.
 
 
-### Phase retrival 3D reconstruction algorithm using 4D-STEM tilt series dataset
+#### Phase retrival 3D reconstruction algorithm using 4D-STEM tilt series dataset
 - Object reconstruction
 - probe optimization
 - scan position optimization
