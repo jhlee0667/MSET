@@ -15,7 +15,7 @@ Please check the GPU memory and computation time if you want to increase volume 
 
 ### Requirements
 - matlab (>= 2018a)
-- CUDA (11.4 was tested)
+- CUDA (11.3 was tested)
 
 ### How to start
 Run ./main.m in MATLAB environment.
