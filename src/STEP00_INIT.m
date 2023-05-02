@@ -227,7 +227,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
             else
                 Memory_saving_N = 1;
             end
-            Nstep = ceil(STEM_data.numberBeams/Memory_saving_N); 
+            Nstep = fix(STEM_data.numberBeams/Memory_saving_N); 
             probe_wf =zeros(size(xx));
             for i = 1:Memory_saving_N
                 if i<=Memory_saving_N-1
