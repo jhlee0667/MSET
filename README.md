@@ -3,7 +3,7 @@
 This package is implemented for 4D-STEM based electron tomography.
 
 #### Phase retrival algorithm using 4D-STEM tilt series dataset
-- 3D Object reconstruction
+- 3D object reconstruction
 - Probe optimization
 - Scan position optimization
 
