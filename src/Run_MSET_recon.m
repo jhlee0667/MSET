@@ -62,14 +62,12 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     [STEM_data] = STEP00_INIT(STEM_data);
 
     % make folder & files
-    rec_save = zeros(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter);
-    mean_error = zeros(1, STEM_data.N_iter);
-    total_mean_error = zeros(1, STEM_data.N_iter);
-    
     fprintf("output path: %s/%s.mat \n\n", STEM_data.output_filepath, STEM_data.output_filename);
-    save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", "rec_save", "mean_error", "total_mean_error", '-v7.3');
+    save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", '-v7.3');
     mat_save = matfile(sprintf("%s/%s.mat", STEM_data.output_filepath, STEM_data.output_filename), 'Writable', true);
-    clear rec_save mean_error total_mean_error
+    mat_save.rec_save(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter) = 0;
+    mat_save.mean_error(1, STEM_data.N_iter) = 0;
+    mat_save.total_mean_error(1, STEM_data.N_iter) = 0;
     
     N_angle = size(STEM_data.tilt_angles,1);
     STEM_data.measured_4D_data = {};
