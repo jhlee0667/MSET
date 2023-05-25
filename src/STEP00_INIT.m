@@ -51,8 +51,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         error('input error: put proper PATH information of 4D-STEM files.');
     end
     
-    
-
     % check: method
     if ~any(ismember(fields(STEM_data),'method'))
         STEM_data.method = 0;
