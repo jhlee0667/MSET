@@ -91,7 +91,12 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.Nth_angle = j;
                 [STEM_data] = STEP01_ROTATION(STEM_data);
                 
-                STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
+                % upload 4D-STEM data for each tilt angle
+                if ~isempty(STEM_data.input_filename_list)
+                    STEM_data.measured_4D_data = importdata(sprintf("%s/%s.mat",STEM_data.input_filepath,STEM_data.input_filename_list(j)));
+                elseif ~isempty(STEM_data.input_filename)
+                    STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
+                end
                 STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
 
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);
@@ -165,7 +170,12 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.Nth_angle = j;
                 [STEM_data] = STEP01_ROTATION(STEM_data);
         
-                STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
+                % upload 4D-STEM data for each tilt angle
+                if ~isempty(STEM_data.input_filename_list)
+                    STEM_data.measured_4D_data = importdata(sprintf("%s/%s.mat",STEM_data.input_filepath,STEM_data.input_filename_list(j)));
+                elseif ~isempty(STEM_data.input_filename)
+                    STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
+                end
                 STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
 
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);

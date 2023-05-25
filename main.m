@@ -11,14 +11,21 @@ clc
 %% input parameters
 %%% input data %%%
 STEM_data.input_filepath = './examples/CuAu_24size_dataset'; % 4D-STEM input data folder path
-STEM_data.input_filename = 'CuAu_s24_p72_Np_8_4DSTEM_data'; % 4D-STEM input data file name
+STEM_data.input_filename_list = ["CuAu_s24_p72_Np_8_4DSTEM_data_1", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_2", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_3", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_4", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_5", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_6", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_7", ...
+                                 "CuAu_s24_p72_Np_8_4DSTEM_data_8"]; % 4D-STEM input data file name list
 STEM_data.output_filepath = STEM_data.input_filepath; % output (reconstruction file) folder path
 STEM_data.output_filename = 'MSET_recon'; % output (reconstruction file) file name
 STEM_data.tilt_angles = importdata('./examples/CuAu_24size_dataset/tilt_angles.mat'); % tilt angles (Nx3 array) (deg)
 STEM_data.vec1 = [0 0 1]; % first angles rotation direction
 STEM_data.vec2 = [0 1 0]; % second angles rotation direction
 STEM_data.vec3 = [1 0 0]; % third angles rotation direction
-STEM_data.scan_pos = importdata('./examples/CuAu_24size_dataset/scan_pos.mat'); % probe scan position (Nx2 array) (A)
+STEM_data.scan_pos = importdata('./examples/CuAu_24size_dataset/scan_pos.mat'); % probe scan position (Nx2 array) (pixels)
 %STEM_data.probe_step_size = 0.4; % scan step size (A)
 
 %%% reconstruction conditions %%%
@@ -43,4 +50,4 @@ STEM_data.TV_lambda = 0.005; % TV lambda parameter
 
 
 %% Run
-[STEM_data] = Q(STEM_data);
+[STEM_data] = Run_MSET_recon(STEM_data);

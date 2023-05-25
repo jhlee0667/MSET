@@ -18,6 +18,40 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         mkdir(STEM_data.output_filepath);
         fprintf('mkdir: %s \n',STEM_data.output_filepath);
     end
+    
+    % check: input data (tilt angles)
+    if ~any(ismember(fields(STEM_data),'tilt_angles'))
+        error('input error: put tilt angles into "tilt_angles".');
+        if size(STEM_data.tilt_angles,2) ~= 3
+            error('input error: put proper format of tilt_angles (Number of tilt angles x 3).');
+        end
+    end
+
+    % check: input data (4D-STEM files)
+    if any(ismember(fields(STEM_data),'input_filename_list'))
+        if length(STEM_data.input_filename_list) ~= size(STEM_data.tilt_angles,1)
+            error('input error: put the same number of 4D-STEM files with the number of tilt angles.');
+        end
+
+        for i1 = 1:size(STEM_data.tilt_angles,2)
+            if ~isfile(sprintf('%s/%s.mat',STEM_data.output_filepath,STEM_data.input_filename_list(i1)))
+                error('input error: no files (4D-STEM files)');
+            end
+        end
+
+        STEM_data.input_filename = [];
+    elseif any(ismember(fields(STEM_data),'input_filename'))
+        for i1 = 1:size(STEM_data.tilt_angles,2)
+            if ~isfile(sprintf('%s/%s_%d.mat',STEM_data.output_filepath,STEM_data.input_filename,i1))
+                error('input error: no files (4D-STEM files)');
+            end
+        end
+        STEM_data.input_filename_list = [];
+    else
+        error('input error: put proper PATH information of 4D-STEM files.');
+    end
+    
+    
 
     % check: method
     if ~any(ismember(fields(STEM_data),'method'))
