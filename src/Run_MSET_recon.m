@@ -9,7 +9,8 @@
 
 %%% input data %%%
 % STEM_data.input_filepath: 4D-STEM input data folder path
-% STEM_data.input_filename: 4D-STEM input data file name
+% STEM_data.input_filename_list; 4D-STEM input data file name list (new version)
+% STEM_data.input_filename: 4D-STEM input data file name (old version)
 % STEM_data.output_filepath: output (reconstruction file) folder path
 % STEM_data.output_filename: output (reconstruction file) file name
 % STEM_data.tilt_angles: tilt angles (Nx3 array) (deg)
