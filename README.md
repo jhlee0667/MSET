@@ -7,7 +7,7 @@ This package is implemented for 4D-STEM based electron tomography.
 - Probe optimization
 - Scan position optimization
 
-For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, *Physical Review Applied* (accepted), arXiv:2210.12636.
+For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, Phys. Rev. Appl. 19, 054062 (2023).
 
 This reconstruction method requires much computaional resources.
 Please check the GPU memory and computation time if you want to increase volume size.
