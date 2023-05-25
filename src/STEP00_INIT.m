@@ -1,4 +1,4 @@
-% Author: J.Lee, KAIST (Korea), 2021.
+% Author: J.Lee, KAIST (Korea), 2022.
 % Y.Yang, Multi-Dimensional Atomic Imaging Lab
 
 function [STEM_data] = STEP00_INIT(STEM_data)
