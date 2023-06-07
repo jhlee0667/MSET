@@ -33,7 +33,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
             error('input error: put the same number of 4D-STEM files with the number of tilt angles.');
         end
 
-        for i1 = 1:size(STEM_data.tilt_angles,2)
+        for i1 = 1:size(STEM_data.tilt_angles,1)
             if ~isfile(sprintf('%s/%s.mat',STEM_data.input_filepath,STEM_data.input_filename_list(i1)))
                 error('input error: no files (4D-STEM files)');
             end
@@ -41,7 +41,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
         STEM_data.input_filename = [];
     elseif any(ismember(fields(STEM_data),'input_filename'))
-        for i1 = 1:size(STEM_data.tilt_angles,2)
+        for i1 = 1:size(STEM_data.tilt_angles,1)
             if ~isfile(sprintf('%s/%s_%d.mat',STEM_data.input_filepath,STEM_data.input_filename,i1))
                 error('input error: no files (4D-STEM files)');
             end
