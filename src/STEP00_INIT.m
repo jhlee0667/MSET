@@ -29,6 +29,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
     % check: input data (4D-STEM files)
     if any(ismember(fields(STEM_data),'input_filename_list'))
+        STEM_data.input_filename_list = string(STEM_data.input_filename_list);
         if length(STEM_data.input_filename_list) ~= size(STEM_data.tilt_angles,1)
             error('input error: put the same number of 4D-STEM files with the number of tilt angles.');
         end
