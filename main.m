@@ -41,6 +41,7 @@ STEM_data.C5 = 0; % C5 aberration (A)
 STEM_data.use_gpu = 0; % computation modes (0: cpu, 1:matlab gpu, 2: cuda)
 STEM_data.step_size = [1*10^(2), 0, 0]; % step size 1x3 input, [objection rec. step size, probe shape optimization step size, scan position step size]
 STEM_data.N_iter = 5; % Number of iterations
+STEM_data.store_iterations = 0; % store object
 
 %%% regularization parameters %%%
 STEM_data.bls_parameter = 0.1; % backtracking line search parameter

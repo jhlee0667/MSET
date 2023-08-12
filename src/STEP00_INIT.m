@@ -3,7 +3,6 @@
 
 function [STEM_data] = STEP00_INIT(STEM_data)
 
-
     %%% parameter initialize
     STEM_data.rec = single(STEM_data.rec);
     STEM_data.error = zeros(1,size(STEM_data.tilt_angles,1));
@@ -27,7 +26,8 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         end
     end
 
-    % check: input data (4D-STEM files)
+    % check & load: input data (a tilt series of 4D-STEM data)
+    STEM_data.raw_5ddata = {};
     if any(ismember(fields(STEM_data),'input_filename_list'))
         STEM_data.input_filename_list = string(STEM_data.input_filename_list);
         if length(STEM_data.input_filename_list) ~= size(STEM_data.tilt_angles,1)
@@ -37,6 +37,9 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         for i1 = 1:size(STEM_data.tilt_angles,1)
             if ~isfile(sprintf('%s/%s.mat',STEM_data.input_filepath,STEM_data.input_filename_list(i1)))
                 error('input error: no files (4D-STEM files)');
+            else
+                STEM_data.raw_5ddata{i1} = importdata(sprintf("%s/%s.mat",STEM_data.input_filepath,STEM_data.input_filename_list(i1)));
+                STEM_data.raw_5ddata{i1} = cellfun(@single,STEM_data.raw_5ddata{i1},'un',0);
             end
         end
 
@@ -45,6 +48,9 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         for i1 = 1:size(STEM_data.tilt_angles,1)
             if ~isfile(sprintf('%s/%s_%d.mat',STEM_data.input_filepath,STEM_data.input_filename,i1))
                 error('input error: no files (4D-STEM files)');
+            else
+                STEM_data.raw_5ddata{i1} = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,i1));
+                STEM_data.raw_5ddata{i1} = cellfun(@single,STEM_data.raw_5ddata{i1},'un',0);
             end
         end
         STEM_data.input_filename_list = [];
@@ -52,6 +58,17 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         error('input error: put proper PATH information of 4D-STEM files.');
     end
     
+    STEM_data.mean_intensity_list = zeros(1,size(STEM_data.tilt_angles,1));
+    for i1 = 1:size(STEM_data.tilt_angles,1)
+        for x1 = 1:size(STEM_data.raw_5ddata{i1},1)
+            for y1 = 1:size(STEM_data.raw_5ddata{i1},2)
+                STEM_data.mean_intensity_list(i1) = STEM_data.mean_intensity_list(i1) ...
+                    + sum(STEM_data.raw_5ddata{i1}{x1,y1},[1,2])/size(STEM_data.raw_5ddata{i1},1)/size(STEM_data.raw_5ddata{i1},2);
+            end
+        end 
+    end
+
+
     % check: method
     if ~any(ismember(fields(STEM_data),'method'))
         STEM_data.method = 0;
@@ -129,8 +146,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if ~any(ismember(fields(STEM_data),'TV_lambda'))
         STEM_data.TV_lambda = 0.005;
     end
-
-
 
     %%% Generate STEP01 variable
     % Calculate scan positions
@@ -279,15 +294,15 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         
             end
 
-            probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);          
+            probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);   
+            %probe_wf = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(probe_wf)).^2,[1 2])) ...
+            %    * probe_wf; %normalize
             
-            fft_probe_wf = fft2(probe_wf);
-            Ap = max(abs(fft_probe_wf(:)));
-            probe_wfn = 1/Ap * probe_wf; %normalize
+            Ap = max(abs(fft2(probe_wf)),[],[1 2]);
+            probe_wf = 1/Ap * probe_wf; %normalize
         end
         
-        STEM_data.probe_wfn(:,:,p) = single(probe_wfn);
-        %STEM_data.init_wave2D = single(probe_wfn);
+        STEM_data.probe_wfn(:,:,p) = single(probe_wf);
     end
 
     if STEM_data.use_gpu == 1
