@@ -298,8 +298,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
             probe_wf = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(probe_wf)).^2,[1 2])) ...
                 * probe_wf; %normalize
             
-            %Ap = max(abs(fft2(probe_wf)),[],[1 2]);
-            %probe_wf = 1/Ap * probe_wf; %normalize
         end
         
         STEM_data.probe_wfn(:,:,p) = single(probe_wf);
