@@ -77,6 +77,11 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         STEM_data.use_gpu = 0;
     end
 
+    % check: save
+    if ~any(ismember(fields(STEM_data),'store_iterations'))
+        STEM_data.store_iterations = 0;
+    end
+
     % check: metadata
     if ~any(ismember(fields(STEM_data),'potential_pixelsize'))
         error('input error: put potential_pixelsize value into "potential_pixelsize".');
@@ -146,6 +151,9 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if ~any(ismember(fields(STEM_data),'TV_lambda'))
         STEM_data.TV_lambda = 0.005;
     end
+
+
+
 
     %%% Generate STEP01 variable
     % Calculate scan positions
