@@ -60,9 +60,6 @@
 
 function [STEM_data] = Run_MSET_recon(STEM_data)
 
-    %%% Initialize 
-    [STEM_data] = STEP00_INIT(STEM_data);
-
     % make folder & files
     fprintf("output path: %s/%s.mat \n\n", STEM_data.output_filepath, STEM_data.output_filename);
     save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", '-v7.3');
@@ -74,7 +71,10 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     end
     mat_save.mean_error(1, STEM_data.N_iter) = 0;
     mat_save.total_mean_error(1, STEM_data.N_iter) = 0;
-    
+
+    %%% Initialize 
+    [STEM_data] = STEP00_INIT(STEM_data);
+  
     N_angle = size(STEM_data.tilt_angles,1);
     STEM_data.measured_4D_data = {};
     old_mean_error = 10^31;
@@ -282,7 +282,13 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     end
     tEnd = toc(tStart)
     
+    % clear 4D-STEM data
+    STEM_data.raw_5ddata = [];
+    STEM_data.measured_4D_data = [];
+    STEM_data.calculated_4D_data = [];
+    % save meta data
     mat_save.STEM_data = STEM_data;
+
     if breakflag == 1 && STEM_data.N_iter > 50 && STEM_data.store_iterations == 1
         mat_save.rec_save(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
         mat_save.mean_error(:,STEM_data.N_iter-40:STEM_data.N_iter)=[];

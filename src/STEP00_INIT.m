@@ -316,6 +316,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
     
     %%%
-    fprintf('Initialize... done.\n');
+    fprintf('Initialize... done.\n\n');
 
 end

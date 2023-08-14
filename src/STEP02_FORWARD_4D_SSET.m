@@ -21,17 +21,17 @@ function [STEM_data] = STEP02_FORWARD_4D_SSET(STEM_data)
     % Forward propagation
     wave_f = wave_f.*STEM_data.proj_trans;
     wave_f = fftshift(fftn(ifftshift(wave_f)));
-    STEM_data.full_4D_data{x1,y1} = abs(wave_f).^2;
+    STEM_data.calculated_4D_data{x1,y1} = abs(wave_f).^2;
     
     % load measured 4D data
     measured_4D_data = STEM_data.measured_4D_data{x1,y1}; 
     
     % calculate residual vector
-    STEM_data.resi_vec = wave_f.*(1-(measured_4D_data).^(0.5)./(STEM_data.full_4D_data{x1,y1}+10^(-30)).^(0.5));
+    STEM_data.resi_vec = wave_f.*(1-(measured_4D_data).^(0.5)./(STEM_data.calculated_4D_data{x1,y1}+10^(-30)).^(0.5));
     %STEM_data.resi_vec = exp(1i*angle(wave_f)).*(abs(wave_f)-(measured_4D_data).^(0.5));
 
     % estimate error
-    tmp_error = (measured_4D_data.^(0.5)-STEM_data.full_4D_data{x1,y1}.^(0.5)).^2;
+    tmp_error = (measured_4D_data.^(0.5)-STEM_data.calculated_4D_data{x1,y1}.^(0.5)).^2;
     STEM_data.error(STEM_data.Nth_angle) = STEM_data.error(STEM_data.Nth_angle) + mean(abs(tmp_error(:)))/STEM_data.N_scan_x/STEM_data.N_scan_y;
 
 end
