@@ -19,6 +19,8 @@
 % STEM_data.vec1 = [0 0 1]; first angles rotation direction
 % STEM_data.vec2 = [0 1 0]; second angles rotation direction
 % STEM_data.vec3 = [1 0 0]; third angles rotation direction
+% STEM_data.diffraction_rotation: apply rotation to 4d-stem data, rotation degree
+% STEM_data.diffraction_transpose: apply transpose to 4d-stem data,  on: 1, off: 0
 
 %%% reconstruction conditions %%%
 % STEM_data.method: 0 for MSET, 1 for SSET

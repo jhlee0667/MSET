@@ -58,15 +58,38 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         error('input error: put proper PATH information of 4D-STEM files.');
     end
     
+    % raw 4d stem data, rotation
+    if ~any(ismember(fields(STEM_data),'diffraction_rotation'))
+        STEM_data.diffraction_rotation = 0;
+    end
+
+    Rot = [cosd(STEM_data.diffraction_rotation), -sind(STEM_data.diffraction_rotation);
+           sind(STEM_data.diffraction_rotation), cosd(STEM_data.diffraction_rotation)];
+
+    % raw 4d stem data, transpose
+    if ~any(ismember(fields(STEM_data),'diffraction_transpose'))
+        STEM_data.diffraction_transpose = 0;
+    end
+    
+    % calculate mean diffraction intensity & rotation & transpose
     STEM_data.mean_intensity_list = zeros(1,size(STEM_data.tilt_angles,1));
     for i1 = 1:size(STEM_data.tilt_angles,1)
         for x1 = 1:size(STEM_data.raw_5ddata{i1},1)
             for y1 = 1:size(STEM_data.raw_5ddata{i1},2)
+                
+                if STEM_data.diffraction_rotation ~= 0
+                    if STEM_data.diffraction_transpose == 0
+                        STEM_data.raw_5ddata{i1}{x1,y1} = single(Func_inv_rotating_2D(STEM_data.raw_5ddata{i1}{x1,y1} , Rot));
+                    else
+                        STEM_data.raw_5ddata{i1}{x1,y1} = single(transpose(Func_inv_rotating_2D(STEM_data.raw_5ddata{i1}{x1,y1} , Rot)));
+                    end
+                end
                 STEM_data.mean_intensity_list(i1) = STEM_data.mean_intensity_list(i1) ...
-                    + sum(STEM_data.raw_5ddata{i1}{x1,y1},[1,2])/size(STEM_data.raw_5ddata{i1},1)/size(STEM_data.raw_5ddata{i1},2);
+                + sum(STEM_data.raw_5ddata{i1}{x1,y1},[1,2])/size(STEM_data.raw_5ddata{i1},1)/size(STEM_data.raw_5ddata{i1},2);
             end
         end 
     end
+
 
 
     % check: method

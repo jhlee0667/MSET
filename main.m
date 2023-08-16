@@ -27,6 +27,8 @@ STEM_data.vec2 = [0 1 0]; % second angles rotation direction
 STEM_data.vec3 = [1 0 0]; % third angles rotation direction
 STEM_data.scan_pos = importdata('./examples/CuAu_24size_dataset/scan_pos.mat'); % probe scan position (Nx2 array) (pixels)
 %STEM_data.probe_step_size = 0.4; % scan step size (A)
+STEM_data.diffraction_rotation = 0; % rotation degree
+STEM_data.diffraction_transpose = 0; % on: 1, off: 0
 
 %%% reconstruction conditions %%%
 STEM_data.method = 0; % 0 for MSET, 1 for SSET
