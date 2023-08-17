@@ -63,9 +63,16 @@
 function [STEM_data] = Run_MSET_recon(STEM_data)
 
     % make folder & files
+    fprintf("\nReconstruction start... \n");
     fprintf("output path: %s/%s.mat \n\n", STEM_data.output_filepath, STEM_data.output_filename);
     save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", '-v7.3');
     mat_save = matfile(sprintf("%s/%s.mat", STEM_data.output_filepath, STEM_data.output_filename), 'Writable', true);
+    
+    % check: save
+    if ~any(ismember(fields(STEM_data),'store_iterations'))
+        STEM_data.store_iterations = 0;
+    end
+
     if STEM_data.store_iterations == 1
         mat_save.rec_save(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter) = 0;
     else
