@@ -80,7 +80,7 @@ mset::paras::~paras(){
 void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
 
     unsigned long dims[3] = {stem_paras->rec_size[0], stem_paras->rec_size[1], stem_paras->rec_size[2]};
-    size_t pot_array_centers[2] = {(size_t) round((stem_paras->rec_size[1]+1.0f)/2), (size_t) round((stem_paras->rec_size[1]+1.0f)/2)};
+    size_t pot_array_centers[2] = {(size_t) std::round((stem_paras->rec_size[1]+1.0f)/2), (size_t) std::round((stem_paras->rec_size[1]+1.0f)/2)};
 
     // --------------------------------------------------------
     const int BATCH = 1;
@@ -345,7 +345,7 @@ void mset::v0::run_main_mset(std::shared_ptr<mset::paras> stem_paras){
 void mset::v0::run_main_sset(std::shared_ptr<mset::paras> stem_paras){
 
     unsigned long dims[3] = {stem_paras->rec_size[0], stem_paras->rec_size[1], stem_paras->rec_size[2]};
-    size_t pot_array_centers[2] = {(size_t) round((stem_paras->rec_size[1]+1.0f)/2), (size_t) round((stem_paras->rec_size[1]+1.0f)/2)};
+    size_t pot_array_centers[2] = {(size_t) std::round((stem_paras->rec_size[1]+1.0f)/2), (size_t) std::round((stem_paras->rec_size[1]+1.0f)/2)};
 
     // --------------------------------------------------------
     const int BATCH = 1;
@@ -557,7 +557,7 @@ void mset::v0::run_main_sset(std::shared_ptr<mset::paras> stem_paras){
 void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
 
     unsigned long dims[3] = {stem_paras->rec_size[0], stem_paras->rec_size[1], stem_paras->rec_size[2]};
-    size_t pot_array_centers[2] = {(size_t) round((stem_paras->rec_size[1]+1.0f)/2), (size_t) round((stem_paras->rec_size[1]+1.0f)/2)};
+    size_t pot_array_centers[2] = {(size_t) std::round((stem_paras->rec_size[1]+1.0f)/2), (size_t) std::round((stem_paras->rec_size[1]+1.0f)/2)};
 
 
     // --------------------------------------------------------
@@ -700,7 +700,7 @@ void mset::v0::run_error_mset(std::shared_ptr<mset::paras> stem_paras){
 void mset::v0::run_error_sset(std::shared_ptr<mset::paras> stem_paras){
 
     unsigned long dims[3] = {stem_paras->rec_size[0], stem_paras->rec_size[1], stem_paras->rec_size[2]};
-    size_t pot_array_centers[2] = {(size_t) round((stem_paras->rec_size[1]+1.0f)/2), (size_t) round((stem_paras->rec_size[1]+1.0f)/2)};
+    size_t pot_array_centers[2] = {(size_t) std::round((stem_paras->rec_size[1]+1.0f)/2), (size_t) std::round((stem_paras->rec_size[1]+1.0f)/2)};
 
     // --------------------------------------------------------
     const int BATCH = 1;
