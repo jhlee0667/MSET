@@ -72,7 +72,12 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
     
     % calculate mean diffraction intensity & rotation & transpose
+    if ~any(ismember(fields(STEM_data),'memory_read_5dstem'))
+        STEM_data.memory_read_5dstem = 0;
+    end
+
     STEM_data.mean_intensity_list = zeros(1,size(STEM_data.tilt_angles,1));
+
     for i1 = 1:size(STEM_data.tilt_angles,1)
         for x1 = 1:size(STEM_data.raw_5ddata{i1},1)
             for y1 = 1:size(STEM_data.raw_5ddata{i1},2)
@@ -92,8 +97,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
             end
         end 
     end
-
-
 
     % check: method
     if ~any(ismember(fields(STEM_data),'method'))

@@ -1,5 +1,7 @@
 #include "mset.cuh"
 
+using namespace std;
+
 // constructor
 mset::paras::paras(std::array<size_t,3> rec_size) : rec_size(rec_size){
 
