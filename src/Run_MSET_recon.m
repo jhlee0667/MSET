@@ -49,6 +49,8 @@
 
 % STEM_data: meta data for reconstruction
 % mat_save.rec: reconstruction file for each iteration 
+% mat_save.probe_wave: reconstruction file for each iteration 
+% mat_save.probe_positions: reconstruction file for each iteration 
 % mat_save.error: mean error list for each iteration 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -74,9 +76,13 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     end
 
     if STEM_data.store_iterations == 1
-        mat_save.rec_save(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter) = 0;
+        mat_save.rec(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter) = 0;
+        mat_save.probe_wave(size(STEM_data.rec,1), size(STEM_data.rec,2), STEM_data.N_iter) = 0;
+        mat_save.probe_positions(size(STEM_data.scan_pos,1),size(STEM_data.scan_pos,2),size(STEM_data.scan_pos,3), STEM_data.N_iter) = 0;        
     else
-        mat_save.rec_save(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3)) = 0;
+        mat_save.rec(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3)) = 0;
+        mat_save.probe_wave(size(STEM_data.rec,1), size(STEM_data.rec,2)) = 0;
+        mat_save.probe_positions(size(STEM_data.scan_pos,1),size(STEM_data.scan_pos,2),size(STEM_data.scan_pos,3)) = 0;     
     end
     mat_save.mean_error(1, STEM_data.N_iter) = 0;
     mat_save.total_mean_error(1, STEM_data.N_iter) = 0;
@@ -277,12 +283,16 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
         
         % save the reconstruction & error
         if STEM_data.N_iter == 1
-            mat_save.rec_save = gather(STEM_data.rec);
+            mat_save.rec = gather(STEM_data.rec);
         else
             if STEM_data.store_iterations == 1
-                mat_save.rec_save(:,:,:,i) = gather(STEM_data.rec);
+                mat_save.rec(:,:,:,i) = gather(STEM_data.rec);
+                mat_save.probe_wave(:,:,:,i) = gather(STEM_data.probe_wfn);
+                mat_save.probe_positions(:,:,:,i) = gather(STEM_data.scan_pos);
             else
-                mat_save.rec_save = gather(STEM_data.rec);
+                mat_save.rec = gather(STEM_data.rec);
+                mat_save.probe_wave = gather(STEM_data.probe_wfn);
+                mat_save.probe_positions = gather(STEM_data.scan_pos);
             end
         end
         mat_save.mean_error(1, i) = mean_error;
@@ -299,7 +309,9 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     mat_save.STEM_data = STEM_data;
 
     if breakflag == 1 && STEM_data.N_iter > 50 && STEM_data.store_iterations == 1
-        mat_save.rec_save(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
+        mat_save.rec(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
+        mat_save.probe_wave(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter) = [];
+        mat_save.probe_positions(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter) = [];
         mat_save.mean_error(:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
         mat_save.total_mean_error(:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
     end
