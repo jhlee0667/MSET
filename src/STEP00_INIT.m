@@ -134,7 +134,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     if ~any(ismember(fields(STEM_data),'alpha'))
         error('input error: put forming aperture value into "alpha".');
     end
-    if ~any(ismember(fields(STEM_data),'probeDefocus'))
+    if ~any(ismember(fields(STEM_data),'probeDefocus')) && ~any(ismember(fields(STEM_data),'probe_wfn'))
         error('input error: put probeDefocus value into "probeDefocus".');
     end
     if ~any(ismember(fields(STEM_data),'C3'))
@@ -216,36 +216,11 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
 
     %%% Generate STEP02 variable
-    % Probe wave function parameter initialize
-    if size(STEM_data.probeDefocus,2) == 1
-        STEM_data.probeDefocus = ones(size(STEM_data.tilt_angles,1)).* STEM_data.probeDefocus;
-        probeflag = 1;
-    elseif size(STEM_data.probeDefocus,2) ~= size(STEM_data.tilt_angles,1)
-        error('input error: make sizes of probeDefocus and tilt angle be same');
-    else
-        probeflag = 0;
-    end
-    if size(STEM_data.C3,2) == 1
-        STEM_data.C3 = ones(size(STEM_data.tilt_angles,1)).* STEM_data.C3;
-        probeflag = probeflag*1;
-    elseif size(STEM_data.C3,2) ~= size(STEM_data.tilt_angles,1)
-        error('input error: make sizes of C3 aberration and tilt angle be same');
-    else
-        probeflag = probeflag*0;
-    end
-    if size(STEM_data.C5,2) == 1
-        STEM_data.C5 = ones(size(STEM_data.tilt_angles,1)).* STEM_data.C5;
-        probeflag = probeflag*1;
-    elseif size(STEM_data.C5,2) ~= size(STEM_data.tilt_angles,1)
-        error('input error: make sizes of C5 aberration and tilt angle be same');
-    else
-        probeflag = probeflag*0;    
-    end
-
     % Calculate electron wavelength and electron interaction parameter
     STEM_data.alphaBeamMax = STEM_data.alpha/1000; % in rads, for specifying maximum angle
     STEM_data.lambda = electron_wavelength(STEM_data.E0*1000); % Electronwavelength in A
     STEM_data.sigma = interaction_constant(STEM_data.E0*1000); % interaction constant rad/Volt/Angstrom
+
 
     % Make the Fourier grid
     kx = 1:STEM_data.pot_size(1);
@@ -295,51 +270,89 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     xx = reshape(xx,[1,prod(pot_size)]);
     yy = reshape(yy,[1,prod(pot_size)]);
     
-    % Generate defocus factor + aberration
-    STEM_data.probeC1 = -1 .* STEM_data.probeDefocus;
-    for p = 1:size(STEM_data.tilt_angles,1)
-        if (probeflag == 0) || (probeflag == 1 && p == 1)
-            chi = (pi*STEM_data.lambda*STEM_data.probeC1(p))*...
-                (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2)...
-                + (pi/2*STEM_data.lambda^3*STEM_data.C3(p))*...
-                (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2).^2 ...
-                + (pi/3*STEM_data.lambda^5*STEM_data.C5(p))*...
-                (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2).^4;
-            
-            % Generate probe wave function
-            if STEM_data.numberBeams > 100
-                Memory_saving_N = 20;
-            else
-                Memory_saving_N = 1;
-            end
-            Nstep = fix(STEM_data.numberBeams/Memory_saving_N); 
-            probe_wf =zeros(size(xx));
-            for i = 1:Memory_saving_N
-                if i<=Memory_saving_N-1
-                    probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:Nstep*i) ...
-                                    -2i*pi ...
-                                   *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*xx*STEM_data.potential_pixelsize ...
-                                   + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*yy*STEM_data.potential_pixelsize))...
-                                   ,1);
-                else
-                    probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:end) ...
-                                    -2i*pi ...
-                                   *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*xx*STEM_data.potential_pixelsize ...
-                                   + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*yy*STEM_data.potential_pixelsize))...
-                                   ,1);
+    if any(ismember(fields(STEM_data),'probe_wfn'))
+        if size(STEM_data.probe_wfn,3) ~= size(STEM_data.tilt_angles,1)
+            if size(STEM_data.probe_wfn,3) == 1
+                for i1 = 1:size(STEM_data.tilt_angles,1)
+                    STEM_data.probe_wfn(:,:,i1) = STEM_data.probe_wfn(:,:,1);
                 end
-        
+            else
+                error('input error: make 3rd dimension of probe_wave and # of tilt angle same');
             end
-
-            probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);   
-            probe_wf = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(probe_wf)).^2,[1 2])) ...
-                * probe_wf; %normalize
-            
         end
-        
-        STEM_data.probe_wfn(:,:,p) = single(probe_wf);
+    else
+        % Probe wave function parameter initialize
+        if size(STEM_data.probeDefocus,2) == 1
+            STEM_data.probeDefocus = ones(size(STEM_data.tilt_angles,1)).* STEM_data.probeDefocus;
+            probeflag = 1;
+        elseif size(STEM_data.probeDefocus,2) ~= size(STEM_data.tilt_angles,1)
+            error('input error: make sizes of probeDefocus and tilt angle be same');
+        else
+            probeflag = 0;
+        end
+        if size(STEM_data.C3,2) == 1
+            STEM_data.C3 = ones(size(STEM_data.tilt_angles,1)).* STEM_data.C3;
+            probeflag = probeflag*1;
+        elseif size(STEM_data.C3,2) ~= size(STEM_data.tilt_angles,1)
+            error('input error: make sizes of C3 aberration and tilt angle be same');
+        else
+            probeflag = probeflag*0;
+        end
+        if size(STEM_data.C5,2) == 1
+            STEM_data.C5 = ones(size(STEM_data.tilt_angles,1)).* STEM_data.C5;
+            probeflag = probeflag*1;
+        elseif size(STEM_data.C5,2) ~= size(STEM_data.tilt_angles,1)
+            error('input error: make sizes of C5 aberration and tilt angle be same');
+        else
+            probeflag = probeflag*0;    
+        end
+    
+    
+        % Generate defocus factor + aberration
+        STEM_data.probeC1 = -1 .* STEM_data.probeDefocus;
+        for p = 1:size(STEM_data.tilt_angles,1)
+            if (probeflag == 0) || (probeflag == 1 && p == 1)
+                chi = (pi*STEM_data.lambda*STEM_data.probeC1(p))*...
+                    (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2)...
+                    + (pi/2*STEM_data.lambda^3*STEM_data.C3(p))*...
+                    (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2).^2 ...
+                    + (pi/3*STEM_data.lambda^5*STEM_data.C5(p))*...
+                    (STEM_data.qxa(STEM_data.beamsIndex).^2+STEM_data.qya(STEM_data.beamsIndex).^2).^4;
+                
+                % Generate probe wave function
+                if STEM_data.numberBeams > 100
+                    Memory_saving_N = 20;
+                else
+                    Memory_saving_N = 1;
+                end
+                Nstep = fix(STEM_data.numberBeams/Memory_saving_N); 
+                probe_wf =zeros(size(xx));
+                for i = 1:Memory_saving_N
+                    if i<=Memory_saving_N-1
+                        probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:Nstep*i) ...
+                                        -2i*pi ...
+                                       *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*xx*STEM_data.potential_pixelsize ...
+                                       + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:Nstep*i)).*yy*STEM_data.potential_pixelsize))...
+                                       ,1);
+                    else
+                        probe_wf = probe_wf + sum(exp(-1i*chi(Nstep*(i-1)+1:end) ...
+                                        -2i*pi ...
+                                       *(STEM_data.qxa(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*xx*STEM_data.potential_pixelsize ...
+                                       + STEM_data.qya(STEM_data.beamsIndex(Nstep*(i-1)+1:end)).*yy*STEM_data.potential_pixelsize))...
+                                       ,1);
+                    end
+            
+                end
+    
+                probe_wf = reshape(probe_wf,[pot_size(1),pot_size(2)]);   
+                probe_wf = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(probe_wf)).^2,[1 2])) ...
+                    * probe_wf; %normalize
+                
+            end
+            
+            STEM_data.probe_wfn(:,:,p) = single(probe_wf);
+        end
     end
-
     if STEM_data.use_gpu == 1
          STEM_data.probe_wfn = gpuArray(STEM_data.probe_wfn);
     end
