@@ -72,10 +72,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
     
     % calculate mean diffraction intensity & rotation & transpose
-    if ~any(ismember(fields(STEM_data),'memory_read_5dstem'))
-        STEM_data.memory_read_5dstem = 0;
-    end
-
     STEM_data.mean_intensity_list = zeros(1,size(STEM_data.tilt_angles,1));
 
     for i1 = 1:size(STEM_data.tilt_angles,1)
@@ -195,8 +191,8 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         end
         STEM_data.scan_pos = single(STEM_data.scan_pos);
     elseif any(ismember(fields(STEM_data),'probe_step_size'))
-        STEM_data.N_scan_x = fix(size(STEM_data.rec,1)/(STEM_data.probe_step_size/STEM_data.potential_pixelsize));
-        STEM_data.N_scan_y = fix(size(STEM_data.rec,2)/(STEM_data.probe_step_size/STEM_data.potential_pixelsize));
+        STEM_data.N_scan_x = size(STEM_data.raw_5ddata{1},1);
+        STEM_data.N_scan_y = size(STEM_data.raw_5ddata{1},2);
         STEM_data.scan_size = [STEM_data.N_scan_x STEM_data.N_scan_y]; % scan size
         STEM_data.scan_pos = [];
         for y1 = 1:STEM_data.N_scan_y
@@ -321,7 +317,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
                 
                 % Generate probe wave function
                 if STEM_data.numberBeams > 100
-                    Memory_saving_N = 20;
+                    Memory_saving_N = 100;
                 else
                     Memory_saving_N = 1;
                 end
