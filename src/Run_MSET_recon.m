@@ -64,9 +64,16 @@
 
 function [STEM_data] = Run_MSET_recon(STEM_data)
 
-    % make folder & files
+    %%%%%%% make folder & files %%%%%%
     fprintf("\nReconstruction start... \n");
+    
+    % check: folder location
+    if ~isfolder(STEM_data.output_filepath)
+        mkdir(STEM_data.output_filepath);
+        fprintf('mkdir: %s \n',STEM_data.output_filepath);
+    end
     fprintf("output path: %s/%s.mat \n\n", STEM_data.output_filepath, STEM_data.output_filename);
+
     save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", '-v7.3');
     mat_save = matfile(sprintf("%s/%s.mat", STEM_data.output_filepath, STEM_data.output_filename), 'Writable', true);
     
@@ -86,6 +93,8 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     end
     mat_save.mean_error(1, STEM_data.N_iter) = 0;
     mat_save.total_mean_error(1, STEM_data.N_iter) = 0;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
     %%% Initialize 
     [STEM_data] = STEP00_INIT(STEM_data);

@@ -4,13 +4,7 @@
 function [STEM_data] = STEP00_INIT(STEM_data)
 
     %%% parameter initialize
-
-    % check: folder location
-    if ~isfolder(STEM_data.output_filepath)
-        mkdir(STEM_data.output_filepath);
-        fprintf('mkdir: %s \n',STEM_data.output_filepath);
-    end
-    
+   
     % check: input data (tilt angles)
     if ~any(ismember(fields(STEM_data),'tilt_angles'))
         error('input error: put tilt angles into "tilt_angles".');
@@ -93,11 +87,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
     if ~any(ismember(fields(STEM_data),'device'))
         STEM_data.device = 0;
-    end
-
-    % check: save
-    if ~any(ismember(fields(STEM_data),'store_iterations'))
-        STEM_data.store_iterations = 0;
     end
 
     % check: metadata
