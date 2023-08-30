@@ -32,7 +32,7 @@
 % STEM_data.probeDefocus: C1 defocus (A)
 % STEM_data.C3: C3 aberration (A) 
 % STEM_data.C5: C5 aberration (A) 
-% STEM_data.use_gpu: computation modes (0: cpu, 1:matlab gpu, 2: cuda)
+% STEM_data.device: computation modes (0: cpu, 1:matlab gpu, 2: cuda)
 % STEM_data.step_size: step size 1x3 input, [objection rec. step size, probe shape optimization step size, scan position step size]
 % STEM_data.N_iter: Number of iterations
 % STEM_data.store_iterations: store object
@@ -127,7 +127,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.scan_ylist = squeeze(STEM_data.scan_pos(:,2,j));
                 STEM_data.init_wave2D = single(STEM_data.probe_wfn(:,:,j));
     
-                if STEM_data.use_gpu == 0 || STEM_data.use_gpu == 1
+                if STEM_data.device == 0 || STEM_data.device == 1
                     for k = 1:size(STEM_data.scan_pos,1)
                         
                         STEM_data.k = k;
@@ -153,7 +153,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                         STEM_data.scan_pos(k,1,j) = STEM_data.row;
                         STEM_data.scan_pos(k,2,j) = STEM_data.col;
                     end
-                elseif STEM_data.use_gpu==2
+                elseif STEM_data.device==2
         
                     % STEP02-04
                     mset_cuda_kernel('upload', STEM_data, STEM_data.measured_4D_data);
@@ -208,7 +208,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.scan_ylist = squeeze(STEM_data.scan_pos(:,2,j));
                 STEM_data.init_wave2D = single(STEM_data.probe_wfn(:,:,j));
 
-                if STEM_data.use_gpu == 0 || STEM_data.use_gpu == 1
+                if STEM_data.device == 0 || STEM_data.device == 1
                     for k = 1:size(STEM_data.scan_pos,1)
                         
                         STEM_data.k = k;
@@ -224,7 +224,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                         end        
                         
                     end
-                elseif STEM_data.use_gpu == 2
+                elseif STEM_data.device == 2
         
                     % STEP02-04
                     mset_cuda_kernel('upload',STEM_data, STEM_data.measured_4D_data);
