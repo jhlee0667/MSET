@@ -64,7 +64,8 @@
 
 function [STEM_data] = Run_MSET_recon(STEM_data)
 
-    %%%%%%% make folder & files %%%%%%
+
+    %%%%%%%%%%%%%%% Initialize %%%%%%%%%%%%%%%%
     fprintf("\nReconstruction start... \n");
     
     % check: folder location
@@ -77,32 +78,33 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     save(sprintf("%s/%s.mat",STEM_data.output_filepath,STEM_data.output_filename), "STEM_data", '-v7.3');
     mat_save = matfile(sprintf("%s/%s.mat", STEM_data.output_filepath, STEM_data.output_filename), 'Writable', true);
     
-    % check: save
-    if ~any(ismember(fields(STEM_data),'store_iterations'))
-        STEM_data.store_iterations = 0;
-    end
-
+    % initialize
+    [STEM_data] = STEP00_INIT(STEM_data);
+    
+    % save initial rec, probe wave, probe scan positions
     if STEM_data.store_iterations == 1
         mat_save.rec(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3), STEM_data.N_iter) = 0;
-        mat_save.probe_wave(size(STEM_data.rec,1), size(STEM_data.rec,2), STEM_data.N_iter) = 0;
-        mat_save.probe_positions(size(STEM_data.scan_pos,1),size(STEM_data.scan_pos,2),size(STEM_data.scan_pos,3), STEM_data.N_iter) = 0;        
+        mat_save.probe_wave(size(STEM_data.probe_wfn,1), size(STEM_data.probe_wfn,2), STEM_data.N_iter) = 0;
+        mat_save.probe_positions(size(STEM_data.scan_pos,1),size(STEM_data.scan_pos,2),size(STEM_data.scan_pos,3), STEM_data.N_iter) = 0;    
+        
+        mat_save.rec(:,:,:,1) = STEM_data.rec;
+        mat_save.probe_wave(:,:,1) = STEM_data.probe_wfn;
+        mat_save.probe_positions(:,:,:,1) = STEM_data.scan_pos;  
     else
-        mat_save.rec(size(STEM_data.rec,1), size(STEM_data.rec,2), size(STEM_data.rec,3)) = 0;
-        mat_save.probe_wave(size(STEM_data.rec,1), size(STEM_data.rec,2)) = 0;
-        mat_save.probe_positions(size(STEM_data.scan_pos,1),size(STEM_data.scan_pos,2),size(STEM_data.scan_pos,3)) = 0;     
+        mat_save.rec = STEM_data.rec;
+        mat_save.probe_wave = STEM_data.probe_wfn;
+        mat_save.probe_positions = STEM_data.scan_pos;    
     end
+        
     mat_save.mean_error(1, STEM_data.N_iter) = 0;
     mat_save.total_mean_error(1, STEM_data.N_iter) = 0;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-    %%% Initialize 
-    [STEM_data] = STEP00_INIT(STEM_data);
   
     N_angle = size(STEM_data.tilt_angles,1);
     STEM_data.measured_4D_data = {};
     old_mean_error = 10^31;
-    step_size = STEM_data.step_size;
+    original_step_size = STEM_data.step_size;
     
     %%% new Reconstruction
     breakflag = 0;
@@ -117,18 +119,11 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
         while true
             for j = 1:N_angle 
                 %%% STEP01 - inverse Rotation (W=R'*U)
-                STEM_data.W = [];
                 STEM_data.Nth_angle = j;
                 [STEM_data] = STEP01_ROTATION(STEM_data);
                 
                 % upload 4D-STEM data for each tilt angle
                 STEM_data.measured_4D_data = STEM_data.raw_5ddata{j};
-                %if ~isempty(STEM_data.input_filename_list)
-                %    STEM_data.measured_4D_data = importdata(sprintf("%s/%s.mat",STEM_data.input_filepath,STEM_data.input_filename_list(j)));
-                %elseif ~isempty(STEM_data.input_filename)
-                %    STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
-                %end
-                %STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
 
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);
                 STEM_data.N_scan_y = size(STEM_data.measured_4D_data,2);
@@ -197,18 +192,11 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     
             for j = 1:N_angle 
                 %%% STEP01 - inverse Rotation (W=R'*U)
-                STEM_data.W = [];
                 STEM_data.Nth_angle = j;
                 [STEM_data] = STEP01_ROTATION(STEM_data);
         
                 % upload 4D-STEM data for each tilt angle
                 STEM_data.measured_4D_data = STEM_data.raw_5ddata{j};
-                %if ~isempty(STEM_data.input_filename_list)
-                %   STEM_data.measured_4D_data = importdata(sprintf("%s/%s.mat",STEM_data.input_filepath,STEM_data.input_filename_list(j)));
-                %elseif ~isempty(STEM_data.input_filename)
-                %   STEM_data.measured_4D_data = importdata(sprintf("%s/%s_%d.mat",STEM_data.input_filepath,STEM_data.input_filename,j));
-                %end
-                %STEM_data.measured_4D_data = cellfun(@single,STEM_data.measured_4D_data,'un',0);
 
                 STEM_data.N_scan_x = size(STEM_data.measured_4D_data,1);
                 STEM_data.N_scan_y = size(STEM_data.measured_4D_data,2);
@@ -262,14 +250,14 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                 STEM_data.step_size = STEM_data.bls_parameter .* STEM_data.step_size;
             end
             
-            if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * step_size(1)
+            if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * original_step_size(1)
                 breakflag = 1;
                 break;
             end
     
         end
         
-        if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * step_size(1)
+        if STEM_data.step_size(1) < (STEM_data.bls_parameter)^5 * original_step_size(1)
             fprintf('break: step_size: [%d, %d, %d] \n', STEM_data.step_size(1),STEM_data.step_size(2),STEM_data.step_size(3));
             break;
         end

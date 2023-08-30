@@ -89,6 +89,11 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         STEM_data.device = 0;
     end
 
+    % check: save
+    if ~any(ismember(fields(STEM_data),'store_iterations'))
+        STEM_data.store_iterations = 0;
+    end
+
     % check: metadata
     if ~any(ismember(fields(STEM_data),'potential_pixelsize'))
         error('input error: put potential_pixelsize value into "potential_pixelsize".');
