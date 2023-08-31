@@ -1,3 +1,6 @@
+% Author: J.Lee, 2023.
+% Multislice electron tomography package
+
 function probe_wf = Func_generate_probe_wave_scan_sub_pixel(probe_wf0,x1,y1)
     
     cent=round((size(probe_wf0)+1)/2);   
