@@ -97,7 +97,7 @@ function [STEM_data] = Func_generate_probe_wave(STEM_data)
     
                 probe_wf = reshape(probe_wf,[STEM_data.pot_size(1),STEM_data.pot_size(2)]);   
                 probe_wf = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(probe_wf)).^2,[1 2])) ...
-                    * probe_wf; %normalize
+                           * probe_wf; %normalize
                 
             end
             
