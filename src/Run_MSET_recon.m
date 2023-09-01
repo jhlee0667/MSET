@@ -25,7 +25,7 @@
 %%% reconstruction conditions %%%
 % STEM_data.method: 0 for MSET, 1 for SSET
 % STEM_data.alpha: Probe forming aperture (mrad)
-% STEM_data.E0: Probe accelerating voltage (kV)
+% STEM_data.E0: Probe acceleration voltage (kV)
 % STEM_data.potential_pixelsize: potential resolution (A);
 % STEM_data.rec: initial volume for 3D reconstruction
 % STEM_data.slice_binning: slice-binning along beam direction

@@ -27,14 +27,14 @@ STEM_data.vec2 = [0 1 0]; % second angles rotation direction
 STEM_data.vec3 = [1 0 0]; % third angles rotation direction
 STEM_data.scan_pos = importdata('./examples/CuAu_24size_dataset/scan_pos.mat'); % probe scan position (Nx2 array) (pixels)
 %STEM_data.probe_step_size = 0.4; % scan step size (A)
-STEM_data.diffraction_rotation = 0; % rotation degree
+STEM_data.diffraction_rotation = 0; % rotation (degree)
 STEM_data.diffraction_transpose = false; % on(true)/off(false)
 
 %%% reconstruction conditions %%%
 STEM_data.method = 0; % 0 for MSET, 1 for SSET
 STEM_data.alpha = 21; % Probe forming aperture (mrad)
-STEM_data.E0 = 300; % Probe accelerating voltage (kV)
-STEM_data.potential_pixelsize = 0.4;% potential resolution (A);
+STEM_data.E0 = 300; % Probe acceleration voltage (kV)
+STEM_data.potential_pixelsize = 0.4; % potential resolution (A);
 STEM_data.rec = zeros(24,24,24); % initial volume for 3D reconstruction
 STEM_data.slice_binning =  1; % slice-binning along beam direction
 STEM_data.probeDefocus = -200; % C1 defocus (A)
