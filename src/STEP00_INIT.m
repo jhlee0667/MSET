@@ -62,15 +62,17 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     STEM_data.mean_intensity_list = zeros(1,size(STEM_data.tilt_angles,1));
 
     for i1 = 1:size(STEM_data.tilt_angles,1)
-        STEM_data.mean_intensity_list(i1) = sum(STEM_data.raw_5ddata{i1},[1,2,3,4])/size(STEM_data.raw_5ddata{i1},1)/size(STEM_data.raw_5ddata{i1},2);
         for x1 = 1:size(STEM_data.raw_5ddata{i1},1)
             for y1 = 1:size(STEM_data.raw_5ddata{i1},2)
                 if STEM_data.diffraction_rotation ~= 0
-                    STEM_data.raw_5ddata{i1}(x1,y1,:,:) = single(Func_inv_rotating_2D(STEM_data.raw_5ddata{i1}(x1,y1,:,:), Rot));
+                    STEM_data.raw_5ddata{i1}{x1,y1} = single(Func_inv_rotating_2D(STEM_data.raw_5ddata{i1}{x1,y1}, Rot));
                 end 
                 if STEM_data.diffraction_transpose == 1
-                    STEM_data.raw_5ddata{i1}(x1,y1,:,:) = single(transpose(STEM_data.raw_5ddata{i1}(x1,y1,:,:)));
+                    STEM_data.raw_5ddata{i1}{x1,y1} = single(transpose(STEM_data.raw_5ddata{i1}{x1,y1}));
                 end
+
+                STEM_data.mean_intensity_list(i1) = STEM_data.mean_intensity_list(i1)+...
+                    sum(STEM_data.raw_5ddata{i1}{x1,y1},[1,2])/size(STEM_data.raw_5ddata{i1},1)/size(STEM_data.raw_5ddata{i1},2);
             end
         end
     end
