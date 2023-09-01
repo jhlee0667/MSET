@@ -66,7 +66,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
 
 
     %%%%%%%%%%%%%%% Initialize %%%%%%%%%%%%%%%%
-    fprintf("\nReconstruction start... \n");
+    fprintf("\nReconstruction starts... \n");
     
     % check: folder location
     if ~isfolder(STEM_data.output_filepath)
