@@ -20,7 +20,7 @@
 % STEM_data.vec2 = [0 1 0]; second angles rotation direction
 % STEM_data.vec3 = [1 0 0]; third angles rotation direction
 % STEM_data.diffraction_rotation: apply rotation to 4d-stem data, rotation degree
-% STEM_data.diffraction_transpose: apply transpose to 4d-stem data,  on: 1, off: 0
+% STEM_data.diffraction_transpose: apply transpose to 4d-stem data, on(true)/off(false)
 
 %%% reconstruction conditions %%%
 % STEM_data.method: 0 for MSET, 1 for SSET
@@ -35,12 +35,12 @@
 % STEM_data.device: computation modes (0: cpu, 1:matlab gpu, 2: cuda)
 % STEM_data.step_size: step size 1x3 input, [objection rec. step size, probe shape optimization step size, scan position step size]
 % STEM_data.N_iter: Number of iterations
-% STEM_data.store_iterations: store object
+% STEM_data.store_iterations: store all iterations information, on(true)/off(false)
 
 %%% regulization parameters %%%
 % STEM_data.bls_parameter: backtracking line search parameter
-% STEM_data.use_positivity: positivity on(1)/off(0)
-% STEM_data.use_TV: TV regularization on(1)/off(0)
+% STEM_data.use_positivity: positivity, on(true)/off(false)
+% STEM_data.use_TV: TV regularization, on(true)/off(false)
 % STEM_data.TV_lambda: TV lambda parameter
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +82,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     [STEM_data] = STEP00_INIT(STEM_data);
     
     % save initial rec, probe wave, probe scan positions
-    if STEM_data.store_iterations ~= 1 || STEM_data.N_iter ==1
+    if STEM_data.store_iterations ~= true || STEM_data.N_iter ==1
         mat_save.rec = STEM_data.rec;
         mat_save.probe_wave = STEM_data.probe_wfn;
         mat_save.probe_positions = STEM_data.scan_pos;
@@ -301,7 +301,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
     % save meta data
     mat_save.STEM_data = STEM_data;
 
-    if breakflag == 1 && STEM_data.N_iter > 50 && STEM_data.store_iterations == 1
+    if STEM_data.N_iter > 50 && STEM_data.store_iterations == true
         mat_save.rec(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter)=[];
         mat_save.probe_wave(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter) = [];
         mat_save.probe_positions(:,:,:,STEM_data.N_iter-40:STEM_data.N_iter) = [];

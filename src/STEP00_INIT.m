@@ -55,7 +55,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
     % raw 4d stem data, transpose
     if ~any(ismember(fields(STEM_data),'diffraction_transpose'))
-        STEM_data.diffraction_transpose = 0;
+        STEM_data.diffraction_transpose = false;
     end
     
     % calculate mean diffraction intensity & rotation & transpose
@@ -67,7 +67,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
                 if STEM_data.diffraction_rotation ~= 0
                     STEM_data.raw_5ddata{i1}{x1,y1} = single(Func_inv_rotating_2D(STEM_data.raw_5ddata{i1}{x1,y1}, Rot));
                 end 
-                if STEM_data.diffraction_transpose == 1
+                if STEM_data.diffraction_transpose == true
                     STEM_data.raw_5ddata{i1}{x1,y1} = single(transpose(STEM_data.raw_5ddata{i1}{x1,y1}));
                 end
 
@@ -87,7 +87,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
     % check: save
     if ~any(ismember(fields(STEM_data),'store_iterations'))
-        STEM_data.store_iterations = 0;
+        STEM_data.store_iterations = false;
     end
 
     % check: metadata
@@ -151,10 +151,10 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         STEM_data.bls_parameter = 0.1;
     end
     if ~any(ismember(fields(STEM_data),'use_positivity'))
-        STEM_data.use_positivity = 1;
+        STEM_data.use_positivity = true;
     end
     if ~any(ismember(fields(STEM_data),'use_TV'))
-        STEM_data.use_TV = 0;
+        STEM_data.use_TV = false;
     end
     if ~any(ismember(fields(STEM_data),'TV_lambda'))
         STEM_data.TV_lambda = 0.005;
@@ -220,6 +220,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     % make error list
     STEM_data.error = zeros(1,size(STEM_data.tilt_angles,1));
     
+    % make sure that rec must have single precision
     STEM_data.rec = single(STEM_data.rec);    
 
     %%% RAM array -> MATLAB VRAM
