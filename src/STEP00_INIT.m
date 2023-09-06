@@ -109,20 +109,6 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         STEM_data.vec3 = [1 0 0];
     end
 
-    % check: probe wavefunction parameter
-    if ~any(ismember(fields(STEM_data),'alpha'))
-        error('input error: put forming aperture value into "alpha".');
-    end
-    if ~any(ismember(fields(STEM_data),'probeDefocus')) && ~any(ismember(fields(STEM_data),'probe_wfn'))
-        error('input error: put probeDefocus value into "probeDefocus".');
-    end
-    if ~any(ismember(fields(STEM_data),'C3'))
-        STEM_data.C3 = 0;
-    end
-    if ~any(ismember(fields(STEM_data),'C5'))
-        STEM_data.C5 = 0;
-    end    
-
     % check: slice binning parameter
     if ~any(ismember(fields(STEM_data),'slice_binning'))
         STEM_data.slice_binning = 1;

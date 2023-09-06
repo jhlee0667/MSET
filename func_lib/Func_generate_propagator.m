@@ -7,8 +7,7 @@
 %         STEM_data.lambda
 %         STEM_data.slice_binning
 
-% output: STEM_data.q2, STEM_data.qxa, STEM_data.qya            
-%         STEM_data.prop
+% output: STEM_data.prop
 %         STEM_data.back_prop
 %         STEM_data.prop2D (for cuda, same as STEM_data.prop)
 
@@ -23,19 +22,19 @@ function [STEM_data] = Func_generate_propagator(STEM_data)
 
     CentPos = round((STEM_data.pot_size+1)/2);
     
-    [STEM_data.qxa, STEM_data.qya] = ndgrid((kx-CentPos(1))*MultF_X,(ky-CentPos(2))*MultF_Y);
-    STEM_data.q2 = STEM_data.qxa.^2 + STEM_data.qya.^2;
+    [qxa, qya] = ndgrid((kx-CentPos(1))*MultF_X,(ky-CentPos(2))*MultF_Y);
+    q2 = qxa.^2 + qya.^2;
 
     % propagators and mask
-    %STEM_data.qMax = min(max(abs(STEM_data.qxa)),max(abs(STEM_data.qya)))/2;
+    %STEM_data.qMax = min(max(abs(qxa)),max(abs(qya)))/2;
     %qMask = false(STEM_data.pot_size);
-    %qMask(STEM_data.CentPos(1)-round(STEM_data.pot_size(1)/4)+1:STEM_data.CentPos(1)+round(STEM_data.pot_size(1)/4),...
-    %    STEM_data.CentPos(1)-round(STEM_data.pot_size(1)/4)+1:STEM_data.CentPos(1)+round(STEM_data.pot_size(1)/4)) = true;
+    %qMask(CentPos(1)-round(STEM_data.pot_size(1)/4)+1:CentPos(1)+round(STEM_data.pot_size(1)/4),...
+    %      CentPos(1)-round(STEM_data.pot_size(1)/4)+1:CentPos(1)+round(STEM_data.pot_size(1)/4)) = true;
     %STEM_data.qMask = qMask;
     
     % Generate Fresnel freespace propagator & back propagator
-    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*STEM_data.q2));
-    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*STEM_data.q2));
+    STEM_data.prop = single(exp((-1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*q2));
+    STEM_data.back_prop = single(exp((+1i*pi*STEM_data.lambda*(STEM_data.potential_pixelsize*STEM_data.slice_binning))*q2));
     STEM_data.prop2D = single(STEM_data.prop);
     
 end

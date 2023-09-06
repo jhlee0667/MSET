@@ -31,15 +31,13 @@ STEM_data.diffraction_rotation = 0; % rotation (degree)
 STEM_data.diffraction_transpose = false; % on(true)/off(false)
 
 %%% reconstruction conditions %%%
-STEM_data.method = 0; % 0 for MSET, 1 for SSET
-STEM_data.alpha = 21; % Probe forming aperture (mrad)
+STEM_data.method = 'MSET'; % "MSET" or "SSET"
 STEM_data.E0 = 300; % Probe acceleration voltage (kV)
 STEM_data.potential_pixelsize = 0.4; % potential resolution (A);
 STEM_data.rec = zeros(24,24,24); % initial volume for 3D reconstruction
 STEM_data.slice_binning = 1; % slice-binning along beam direction
-STEM_data.probeDefocus = -200; % C1 defocus (A)
-STEM_data.C3 = 0; % C3 aberration (A) 
-STEM_data.C5 = 0; % C5 aberration (A) 
+STEM_data.alpha = 21; % Probe forming aperture (mrad)
+STEM_data.probeDefocus = -200; % probe defocus (A)
 STEM_data.device = 0; % computation modes (0: cpu, 1:matlab gpu, 2: cuda)
 STEM_data.step_size = [1*10^(2), 0, 0]; % step size 1x3 input, [object rec. step size, probe shape optimization step size, scan position step size]
 STEM_data.N_iter = 5; % Number of iterations
