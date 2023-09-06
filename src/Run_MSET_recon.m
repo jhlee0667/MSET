@@ -138,7 +138,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                         STEM_data.row = STEM_data.scan_xlist(k);
                         STEM_data.col = STEM_data.scan_ylist(k);
     
-                        if STEM_data.method == 1
+                        if STEM_data.method == "SSET" || STEM_data.method == "sset" 
                             % STEP02 - forward propagation & calculate residual vector
                             [STEM_data] = STEP02_FORWARD_4D_SSET(STEM_data);      
                 
@@ -162,7 +162,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                     % STEP02-04
                     mset_cuda_kernel('upload', STEM_data, STEM_data.measured_4D_data);
     
-                    if STEM_data.method == 1
+                    if STEM_data.method == "SSET" || STEM_data.method == "sset" 
                         [tmp_RVol, tmp_probe, tmp_scan_xlist, tmp_scan_ylist] = mset_cuda_kernel('run_sset',STEM_data, STEM_data.measured_4D_data);               
                     else
                         [tmp_RVol, tmp_probe, tmp_scan_xlist, tmp_scan_ylist] = mset_cuda_kernel('run_mset',STEM_data, STEM_data.measured_4D_data);            
@@ -212,7 +212,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                         STEM_data.row = STEM_data.scan_xlist(k);
                         STEM_data.col = STEM_data.scan_ylist(k);
     
-                        if STEM_data.method == 1
+                        if STEM_data.method == "SSET" || STEM_data.method == "sset" 
                             % STEP02 - forward propagation & calculate residual vector
                             [STEM_data] = STEP02_FORWARD_4D_SSET(STEM_data); 
                         else
@@ -226,7 +226,7 @@ function [STEM_data] = Run_MSET_recon(STEM_data)
                     % STEP02-04
                     mset_cuda_kernel('upload',STEM_data, STEM_data.measured_4D_data);
     
-                    if STEM_data.method == 1
+                    if STEM_data.method == "SSET" || STEM_data.method == "sset" 
                         [tmp_error] = mset_cuda_kernel('error_sset',STEM_data, STEM_data.measured_4D_data);
                     else
                         [tmp_error] = mset_cuda_kernel('error_mset',STEM_data, STEM_data.measured_4D_data);

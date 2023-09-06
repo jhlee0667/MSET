@@ -21,9 +21,9 @@ function [STEM_data] = Func_generate_propagator(STEM_data)
     MultF_X = 1/(length(kx)*STEM_data.potential_pixelsize);
     MultF_Y = 1/(length(ky)*STEM_data.potential_pixelsize);
 
-    STEM_data.CentPos = round((STEM_data.pot_size+1)/2);
+    CentPos = round((STEM_data.pot_size+1)/2);
     
-    [STEM_data.qxa, STEM_data.qya] = ndgrid((kx-STEM_data.CentPos(1))*MultF_X,(ky-STEM_data.CentPos(2))*MultF_Y);
+    [STEM_data.qxa, STEM_data.qya] = ndgrid((kx-CentPos(1))*MultF_X,(ky-CentPos(2))*MultF_Y);
     STEM_data.q2 = STEM_data.qxa.^2 + STEM_data.qya.^2;
 
     % propagators and mask

@@ -79,7 +79,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
     % check: method
     if ~any(ismember(fields(STEM_data),'method'))
-        STEM_data.method = 0;
+        STEM_data.method = "MSET";
     end
     if ~any(ismember(fields(STEM_data),'device'))
         STEM_data.device = 0;
