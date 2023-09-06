@@ -2,8 +2,17 @@
 
 % Generate complex probe wave function
 
-% input:  STEM_data.probeDefocus, STEM_data.aberration_paras.{C1, C3, C5},
-%         STEM_data.alpha, STEM_data.lambda
+% input:  STEM_data.probeDefocus
+%         STEM_data.aberration_paras
+%         %% aberration parameters %%
+%         {C10 -> -1*probe defocus
+%          C12 -> two fold astigmatism (A1)
+%          C21 -> axial comma (B2)
+%          C30 -> 3rd spherical aberration
+%          C50 -> 5rd spherical aberration}
+%         %%%%%
+%         STEM_data.alpha
+%         STEM_data.lambda
 %         STEM_data.tilt_angles
 %         STEM_data.pot_size
 %         STEM_data.mean_intensity_list
@@ -20,45 +29,45 @@ function [STEM_data] = Func_generate_probe_wave(STEM_data)
     end
 
     if ~any(ismember(fields(STEM_data),'aberration_paras'))
-        STEM_data.aberration_paras.C1 = zeros(1,size(STEM_data.tilt_angles,1));
-        STEM_data.aberration_paras.C3 = zeros(1,size(STEM_data.tilt_angles,1));
-        STEM_data.aberration_paras.C5 = zeros(1,size(STEM_data.tilt_angles,1));
+        STEM_data.aberration_paras.C10 = zeros(1,size(STEM_data.tilt_angles,1));
+        STEM_data.aberration_paras.C30 = zeros(1,size(STEM_data.tilt_angles,1));
+        STEM_data.aberration_paras.C50 = zeros(1,size(STEM_data.tilt_angles,1));
     else
-        % C1
-        if any(ismember(fields(STEM_data.aberration_paras),'C1'))
-            if size(STEM_data.aberration_paras.C1, 2) == 1
-                STEM_data.aberration_paras.C1 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C1;
-            elseif size(STEM_data.aberration_paras.C1,2) ~= size(STEM_data.tilt_angles,1)
-                error('input error: make C1 list size and # of tilt angle be same');
+        % C10
+        if any(ismember(fields(STEM_data.aberration_paras),'C10'))
+            if size(STEM_data.aberration_paras.C10, 2) == 1
+                STEM_data.aberration_paras.C10 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C10;
+            elseif size(STEM_data.aberration_paras.C10,2) ~= size(STEM_data.tilt_angles,1)
+                error('input error: make C10 list size and # of tilt angle be same');
             end
         else
-            STEM_data.aberration_paras.C1 = zeros(1,size(STEM_data.tilt_angles,1));
+            STEM_data.aberration_paras.C10 = zeros(1,size(STEM_data.tilt_angles,1));
         end
-        % C3
-        if any(ismember(fields(STEM_data.aberration_paras),'C3'))
-            if size(STEM_data.aberration_paras.C3, 2) == 1
-                STEM_data.aberration_paras.C3 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C3;
-            elseif size(STEM_data.aberration_paras.C3,2) ~= size(STEM_data.tilt_angles,1)
-                error('input error: make C3 list size and # of tilt angle be same');
+        % C30
+        if any(ismember(fields(STEM_data.aberration_paras),'C30'))
+            if size(STEM_data.aberration_paras.C30, 2) == 1
+                STEM_data.aberration_paras.C30 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C30;
+            elseif size(STEM_data.aberration_paras.C30,2) ~= size(STEM_data.tilt_angles,1)
+                error('input error: make C30 list size and # of tilt angle be same');
             end
         else
-            STEM_data.aberration_paras.C3 = zeros(1,size(STEM_data.tilt_angles,1));
+            STEM_data.aberration_paras.C30 = zeros(1,size(STEM_data.tilt_angles,1));
         end
-        % C5
-        if any(ismember(fields(STEM_data.aberration_paras),'C5'))
-            if size(STEM_data.aberration_paras.C5, 2) == 1
-                STEM_data.aberration_paras.C5 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C5;
-            elseif size(STEM_data.aberration_paras.C5,2) ~= size(STEM_data.tilt_angles,1)
-                error('input error: make C5 list size and # of tilt angle be same');
+        % C50
+        if any(ismember(fields(STEM_data.aberration_paras),'C50'))
+            if size(STEM_data.aberration_paras.C50, 2) == 1
+                STEM_data.aberration_paras.C50 = ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.aberration_paras.C50;
+            elseif size(STEM_data.aberration_paras.C50,2) ~= size(STEM_data.tilt_angles,1)
+                error('input error: make C50 list size and # of tilt angle be same');
             end
         else
-            STEM_data.aberration_paras.C5 = zeros(1,size(STEM_data.tilt_angles,1));
+            STEM_data.aberration_paras.C50 = zeros(1,size(STEM_data.tilt_angles,1));
         end
     end
 
     if any(ismember(fields(STEM_data),'probeDefocus'))
         if size(STEM_data.probeDefocus, 2) == 1
-            STEM_data.aberration_paras.C1 = -1*ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.probeDefocus;
+            STEM_data.aberration_paras.C10 = -1*ones(1,size(STEM_data.tilt_angles,1)).* STEM_data.probeDefocus;
         elseif size(STEM_data.probeDefocus,2) ~= size(STEM_data.tilt_angles,1)
             error('input error: make probeDefocus list size and # of tilt angle be same');
         end
@@ -76,7 +85,7 @@ function [STEM_data] = Func_generate_probe_wave(STEM_data)
     
     [qxa, qya] = ndgrid((kx-CentPos(1))*MultF_X,(ky-CentPos(2))*MultF_Y);
     q2 = qxa.^2 + qya.^2;
-
+    q2_alpha = STEM_data.lambda*q2;
 
     % make beam mask
     alphaBeamMax = STEM_data.alpha/1000; % in rads, for specifying maximum angle
@@ -87,10 +96,12 @@ function [STEM_data] = Func_generate_probe_wave(STEM_data)
     for p = 1:size(STEM_data.tilt_angles,1)
         
         % calculate chi
-        chi = (pi*STEM_data.lambda*STEM_data.aberration_paras.C1(p)) * q2...
-            + (pi/2*STEM_data.lambda^3*STEM_data.aberration_paras.C3(p)) * q2.^2 ...
-            + (pi/3*STEM_data.lambda^5*STEM_data.aberration_paras.C5(p)) * q2.^4;
+        chi = (1/2*STEM_data.aberration_paras.C10(p)) * q2_alpha...
+            + (1/4*STEM_data.aberration_paras.C30(p)) * q2_alpha.^2 ...
+            + (1/6*STEM_data.aberration_paras.C50(p)) * q2_alpha.^4;
 
+
+        chi = 2*pi/STEM_data.lambda*chi;
         chi = exp(-1i*chi);
 
         % Generate probe wave function
