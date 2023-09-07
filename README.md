@@ -2,15 +2,15 @@
 
 This package is implemented for 4D-STEM based electron tomography.
 
-#### Phase retrival algorithm using 4D-STEM tilt series dataset
+#### Phase retrieval algorithm using 4D-STEM tilt series dataset
 - 3D object reconstruction
 - Probe wavefunction optimization
 - Scan position optimization
 
-For the detail, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, Phys. Rev. Appl. 19, 054062 (2023).
+For details, please see the paper: J. Lee, M. Lee, Y.K. Park, C. Ophus, and Y. Yang, Multislice Electron Tomography Using Four-dimensional Scanning Electron Microscopy, Phys. Rev. Appl. 19, 054062 (2023).
 
-This reconstruction method requires much computaional resources.
-Please check the GPU memory and computation time if you want to increase volume size.
+This reconstruction method requires a lot of computational resources.
+Please check the GPU memory and computation time to increase the volume size.
 
 
 ### Requirements
