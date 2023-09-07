@@ -24,8 +24,8 @@ function [STEM_data] = STEP02_FORWARD_4D(STEM_data)
     [x1,y1] = ind2sub([STEM_data.N_scan_x, STEM_data.N_scan_y], STEM_data.k);
 
     % Calculate incident beam wave function
-    STEM_data.tmp_probe_wfn = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wfn(:,:,STEM_data.Nth_angle),STEM_data.row,STEM_data.col));
-    wave_f = STEM_data.tmp_probe_wfn;
+    STEM_data.tmp_probe_wave = single(Func_generate_probe_wave_scan_sub_pixel(STEM_data.probe_wave(:,:,STEM_data.Nth_angle),STEM_data.row,STEM_data.col));
+    wave_f = STEM_data.tmp_probe_wave;
     
     % Forward propagation
     for a2 = 1:STEM_data.numPlanes

@@ -188,11 +188,11 @@ function [STEM_data] = STEP00_INIT(STEM_data)
 
 
     % Load or Generate probe wave function
-    if any(ismember(fields(STEM_data),'probe_wfn'))
-        if size(STEM_data.probe_wfn,3) ~= size(STEM_data.tilt_angles,1)
-            if size(STEM_data.probe_wfn,3) == 1
+    if any(ismember(fields(STEM_data),'probe_wave'))
+        if size(STEM_data.probe_wave,3) ~= size(STEM_data.tilt_angles,1)
+            if size(STEM_data.probe_wave,3) == 1
                 for i1 = 1:size(STEM_data.tilt_angles,1)
-                    STEM_data.probe_wfn(:,:,i1) = STEM_data.probe_wfn(:,:,1);
+                    STEM_data.probe_wave(:,:,i1) = STEM_data.probe_wave(:,:,1);
                 end
             else
                 error('input error: make 3rd dimension of probe_wave and # of tilt angle same');
@@ -201,6 +201,12 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     else
         % Probe wave function parameter initialize
         [STEM_data] = Func_generate_probe_wave(STEM_data);
+    end
+
+    % normalize probe wave function
+    for p = 1:size(STEM_data.tilt_angles,1)
+        STEM_data.probe_wave(:,:,p) = sqrt(STEM_data.mean_intensity_list(p)/sum(abs(fft2(STEM_data.probe_wave(:,:,p))).^2,[1 2])) ...
+                   * STEM_data.probe_wave(:,:,p); 
     end
 
     % make error list
@@ -214,7 +220,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         STEM_data.error  = gpuArray(STEM_data.error);
         STEM_data.prop = gpuArray(STEM_data.prop);
         STEM_data.back_prop = gpuArray(STEM_data.back_prop);
-        STEM_data.probe_wfn = gpuArray(STEM_data.probe_wfn);
+        STEM_data.probe_wave = gpuArray(STEM_data.probe_wave);
     end
     
     %%%
