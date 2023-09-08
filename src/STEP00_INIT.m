@@ -3,7 +3,7 @@
 
 function [STEM_data] = STEP00_INIT(STEM_data)
 
-    %%% parameter initialize
+    %%% parameter initialize %%%
    
     % check: input data (tilt angles)
     if ~any(ismember(fields(STEM_data),'tilt_angles'))
@@ -199,7 +199,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
             end
         end
     else
-        % Probe wave function parameter initialize
+        % Initialize probe wave function 
         [STEM_data] = Func_generate_probe_wave(STEM_data);
     end
 

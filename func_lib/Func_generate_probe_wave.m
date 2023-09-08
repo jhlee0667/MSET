@@ -7,7 +7,6 @@
 %         STEM_data.lambda
 %         STEM_data.tilt_angles
 %         STEM_data.pot_size
-%         STEM_data.mean_intensity_list
 %         STEM_data.lambda
 
 % output: STEM_data.probe_wfn
