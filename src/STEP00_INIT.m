@@ -45,6 +45,7 @@ function [STEM_data] = STEP00_INIT(STEM_data)
         error('input error: put proper PATH information of 4D-STEM files.');
     end
     
+
     % raw 4d stem data, rotation
     if ~any(ismember(fields(STEM_data),'diffraction_rotation'))
         STEM_data.diffraction_rotation = 0;
@@ -91,6 +92,13 @@ function [STEM_data] = STEP00_INIT(STEM_data)
     end
 
     % check: metadata
+    if ~any(ismember(fields(STEM_data),'E0'))
+        error('input error: put acceleration voltage value (kV) into "E0".');
+    end
+    % Calculate electron wavelength and electron interaction parameter
+    STEM_data.lambda = electron_wavelength(STEM_data.E0*1000); % Electronwavelength in A
+    STEM_data.sigma = interaction_constant(STEM_data.E0*1000); % interaction constant rad/Volt/Angstrom
+
     if ~any(ismember(fields(STEM_data),'potential_pixelsize'))
         error('input error: put potential_pixelsize value into "potential_pixelsize".');
     end

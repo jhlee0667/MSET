@@ -24,14 +24,13 @@
 
 %%% reconstruction conditions %%%
 % STEM_data.method: "MSET" or "SSET"
-% STEM_data.alpha: Probe forming aperture (mrad)
 % STEM_data.E0: Probe acceleration voltage (kV)
 % STEM_data.potential_pixelsize: potential resolution (A);
 % STEM_data.rec: initial volume for 3D reconstruction
 % STEM_data.slice_binning: slice-binning along beam direction
-% STEM_data.probeDefocus: C1 probe defocus (A)
-% STEM_data.C3: C3 aberration (A) 
-% STEM_data.C5: C5 aberration (A) 
+% STEM_data.alpha: Probe forming aperture (convergence semi-angle) (mrad)
+% STEM_data.probeDefocus: C1 defocus (A)
+% STEM_data.aberration_paras: aberrations (A)
 % STEM_data.device: computation modes (0: cpu, 1: matlab gpu, 2: cuda)
 % STEM_data.step_size: step size 1x3 input, [objection rec. step size, probe shape optimization step size, scan position step size]
 % STEM_data.N_iter: Number of iterations
